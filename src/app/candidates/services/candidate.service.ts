@@ -42,6 +42,13 @@ export class CandidateService {
   }
 
   /**
+   * Create a candidate manually (without resume)
+   */
+  createManual(data: Partial<Candidate>): Observable<Candidate> {
+    return this.api.post<Candidate>(`${this.BASE_URL}/manual`, data);
+  }
+
+  /**
    * Update candidate details
    */
   updateCandidate(id: string, data: Partial<Candidate>): Observable<Candidate> {

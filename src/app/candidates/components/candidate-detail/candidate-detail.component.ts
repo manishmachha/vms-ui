@@ -12,6 +12,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { JobApplication } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
+import { Subscription, interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
 import { LoadingModalComponent } from '../../../layout/components/loading-modal/loading-modal.component';
@@ -321,9 +323,8 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
           </div>
 
           <!-- AI Analysis Report (Solventek Only) -->
-
           <div
-            
+            *ngIf="authStore.orgType() === 'SOLVENTEK'"
             class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden relative"
           >
             <div class="flex items-center gap-3 mb-6 relative z-10">
@@ -338,7 +339,12 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+            <div *ngIf="!analysis()" class="flex flex-col items-center justify-center py-12">
+               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+               <p class="text-gray-500 font-medium text-sm">Analyzing resume with AI...</p>
+            </div>
+
+            <div *ngIf="analysis()" class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
               <!-- Chart -->
               <div class="h-64">
                 <canvas
@@ -422,6 +428,39 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
                       >{{ analysis().projectCredibilityRiskScore || 0 }}%</span
                     >
                   </div>
+
+                  <!-- AI Content -->
+                  <div class="p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                    <span
+                      class="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1"
+                      >AI Content</span
+                    >
+                    <span class="text-xl font-bold text-rose-900"
+                      >{{ analysis().aiContentScore || 0 }}%</span
+                    >
+                  </div>
+
+                  <!-- Job Match -->
+                  <div class="p-3 rounded-xl bg-teal-50/50 border border-teal-100">
+                    <span
+                      class="text-[10px] font-bold text-teal-400 uppercase tracking-wider block mb-1"
+                      >Job Match</span
+                    >
+                    <span class="text-xl font-bold text-teal-900"
+                      >{{ analysis().jobMatchScore || 0 }}%</span
+                    >
+                  </div>
+
+                  <!-- Skill Match -->
+                  <div class="p-3 rounded-xl bg-cyan-50/50 border border-cyan-100">
+                    <span
+                      class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1"
+                      >Skill Match</span
+                    >
+                    <span class="text-xl font-bold text-cyan-900"
+                      >{{ analysis().skillMatchScore || 0 }}%</span
+                    >
+                  </div>
                 </div>
 
                 <div
@@ -436,7 +475,7 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
 
             <div
               class="mt-6 pt-6 border-t border-gray-100 relative z-10"
-              *ngIf="analysis().summary"
+              *ngIf="analysis()?.summary"
             >
               <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
                 Executive Summary
@@ -827,26 +866,53 @@ export class CandidateDetailComponent implements OnInit {
   showDeleteConfirm = signal(false);
   showArchiveConfirm = signal(false);
 
+  private pollingSub?: Subscription;
+
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
-        this.loadCandidate(id);
+        this.startPolling(id);
       }
     });
   }
 
-  loadCandidate(id: string) {
-    this.candidateService.getCandidate(id).subscribe({
-      next: (c) => {
-        this.candidate.set(c);
-        this.loadBrandedResume(c.id);
-        this.loadApplications(c.id);
-        this.loadInterviews(c.id);
-      },
-      error: (err) => console.error('Failed to load candidate', err),
-    });
+  ngOnDestroy() {
+    if (this.pollingSub) {
+      this.pollingSub.unsubscribe();
+    }
   }
+
+  startPolling(id: string) {
+    if (this.pollingSub) this.pollingSub.unsubscribe();
+    
+    this.pollingSub = interval(5000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.candidateService.getCandidate(id))
+      )
+      .subscribe({
+        next: (c) => {
+          this.candidate.set(c);
+          
+          if (c.aiAnalysisJson && c.email !== 'Processing...') {
+            this.pollingSub?.unsubscribe();
+          }
+
+          if (this.applications().length === 0) this.loadApplications(c.id);
+          if (this.interviews().length === 0) this.loadInterviews(c.id);
+          
+          if (!this.brandedResume()) {
+            this.loadBrandedResume(c.id);
+          } else if (this.brandedResume()?.status === 'GENERATING') {
+            this.loadBrandedResume(c.id);
+          }
+        },
+        error: (err) => console.error('Failed to load candidate', err),
+      });
+  }
+
+
 
   loadApplications(id: string) {
     this.candidateService.getCandidateApplications(id).subscribe({
@@ -962,6 +1028,9 @@ export class CandidateDetailComponent implements OnInit {
     'Timeline Risk',
     'Skill Inflation',
     'Credibility',
+    'AI Content',
+    'Job Match',
+    'Skill Match',
   ];
 
   // Risk Definitions
@@ -1006,6 +1075,30 @@ export class CandidateDetailComponent implements OnInit {
       description:
         'Assessment of project descriptions for technical depth and authenticity vs. generic templates.',
     },
+    {
+      title: 'AI Content',
+      icon: 'psychology',
+      color: 'text-rose-600',
+      bgColor: 'bg-rose-50',
+      description:
+        'Probability that the resume was heavily generated or optimized using AI tools.',
+    },
+    {
+      title: 'Job Match',
+      icon: 'center_focus_strong',
+      color: 'text-teal-600',
+      bgColor: 'bg-teal-50',
+      description:
+        'Overall alignment between the candidate profile and the specific job description.',
+    },
+    {
+      title: 'Skill Match',
+      icon: 'code',
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-50',
+      description:
+        'Direct overlap between the required skills for the job and the candidates experience.',
+    },
   ];
 
   public radarChartData = computed<ChartData<'radar'>>(() => {
@@ -1027,6 +1120,9 @@ export class CandidateDetailComponent implements OnInit {
             analysis.timelineRiskScore || 0,
             analysis.skillInflationRiskScore || 0,
             analysis.projectCredibilityRiskScore || 0,
+            analysis.aiContentScore || 0,
+            analysis.jobMatchScore || 0,
+            analysis.skillMatchScore || 0,
           ],
           label: 'Score Analysis',
           borderColor: '#4f46e5',

@@ -15,6 +15,9 @@ export interface Project {
   status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD' | 'PLANNED';
   startDate?: string;
   endDate?: string;
+  requestId?: string;
+  billRate?: number;
+  payRate?: number;
   allocations?: ProjectAllocation[];
   createdAt?: string;
   updatedAt?: string;

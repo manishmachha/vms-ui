@@ -61,6 +61,21 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
           </div>
         </div>
 
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Request ID</label>
+            <input type="text" formControlName="requestId" class="input-modern" placeholder="REQ-001" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Bill Rate</label>
+            <input type="number" formControlName="billRate" class="input-modern" placeholder="0.00" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pay Rate</label>
+            <input type="number" formControlName="payRate" class="input-modern" placeholder="0.00" />
+          </div>
+        </div>
+
         <div class="pt-4 flex gap-3">
           <button
             type="button"
@@ -105,6 +120,9 @@ export class AddProjectModalComponent implements OnChanges {
     clientId: [null as string | number | null],
     startDate: [''],
     endDate: [''],
+    requestId: [''],
+    billRate: [null as number | null],
+    payRate: [null as number | null],
   });
 
   ngOnChanges(changes: SimpleChanges) {
@@ -119,6 +137,9 @@ export class AddProjectModalComponent implements OnChanges {
           clientId: this.editProject.client?.id || null,
           startDate: this.editProject.startDate || '',
           endDate: this.editProject.endDate || '',
+          requestId: this.editProject.requestId || '',
+          billRate: this.editProject.billRate || null,
+          payRate: this.editProject.payRate || null,
         });
       } else {
         // Creating new project
@@ -136,6 +157,9 @@ export class AddProjectModalComponent implements OnChanges {
         description: formVal.description,
         startDate: formVal.startDate,
         endDate: formVal.endDate,
+        requestId: formVal.requestId || undefined,
+        billRate: formVal.billRate || undefined,
+        payRate: formVal.payRate || undefined,
         clientId: formVal.clientId ? Number(formVal.clientId) : undefined,
       };
 

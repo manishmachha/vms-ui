@@ -18,6 +18,7 @@ import { NotificationService } from '../../services/notification.service';
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div></div>
         <div class="flex gap-3">
+          <a routerLink="/vendors/create" class="btn-primary px-4 py-2 rounded-xl">Create vendor</a>
           <span class="badge badge-success">{{ activeCount() }} Active</span>
           <span class="badge badge-warning">{{ inactiveCount() }} Inactive</span>
         </div>
@@ -76,7 +77,7 @@ import { NotificationService } from '../../services/notification.service';
             <div class="flex items-center gap-4">
               <app-organization-logo
                 [org]="vendor"
-                size="xl"
+                  size="xl"
                 [rounded]="true"
               ></app-organization-logo>
               <div>

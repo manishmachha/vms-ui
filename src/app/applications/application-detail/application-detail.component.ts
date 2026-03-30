@@ -19,6 +19,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BaseChartDirective } from 'ng2-charts';
+import { Subscription, interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 
 import { ApplicationService } from '../../services/application.service';
 import { DialogService } from '../../services/dialog.service';
@@ -98,6 +100,7 @@ export class ApplicationDetailComponent implements OnInit {
   loading = signal(true);
   analyzing = signal(false);
   isUploading = signal(false);
+  isPollingAnalysis = signal(true);
 
   // Interview State
   interviews = signal<Interview[]>([]);
@@ -190,6 +193,9 @@ export class ApplicationDetailComponent implements OnInit {
     'Timeline Risk',
     'Skill Inflation',
     'Credibility',
+    'AI Content',
+    'Job Match',
+    'Skill Match',
   ];
 
   public radarChartData: ChartData<'radar'> = {
@@ -240,6 +246,30 @@ export class ApplicationDetailComponent implements OnInit {
       description:
         'Assessment of project descriptions for technical depth and authenticity vs. generic templates.',
     },
+    {
+      title: 'AI Content',
+      icon: 'psychology',
+      color: 'text-rose-600',
+      bgColor: 'bg-rose-50',
+      description:
+        'Probability that the resume was heavily generated or optimized using AI tools.',
+    },
+    {
+      title: 'Job Match',
+      icon: 'center_focus_strong',
+      color: 'text-teal-600',
+      bgColor: 'bg-teal-50',
+      description:
+        'Overall alignment between the candidate profile and the specific job description.',
+    },
+    {
+      title: 'Skill Match',
+      icon: 'code',
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-50',
+      description:
+        'Direct overlap between the required skills for the job and the candidates experience.',
+    },
   ];
 
   constructor() {
@@ -257,6 +287,9 @@ export class ApplicationDetailComponent implements OnInit {
                 analysis.timelineRiskScore || 0,
                 analysis.skillInflationRiskScore || 0,
                 analysis.projectCredibilityRiskScore || 0,
+                analysis.aiContentScore || 0,
+                analysis.jobMatchScore || 0,
+                analysis.skillMatchScore || 0,
               ],
               label: 'Score Analysis',
               borderColor: '#4f46e5',
@@ -284,9 +317,41 @@ export class ApplicationDetailComponent implements OnInit {
       this.loadApplication(id);
       this.loadTimeline(id);
       this.loadDocuments(id);
-      this.loadAnalysis(id);
+      this.startAnalysisPolling(id);
       this.loadInterviews(id);
     }
+  }
+
+  ngOnDestroy() {
+    if (this.analysisPollingSub) {
+      this.analysisPollingSub.unsubscribe();
+    }
+  }
+
+  private analysisPollingSub?: Subscription;
+
+  startAnalysisPolling(id: string | number) {
+    if (this.analysisPollingSub) this.analysisPollingSub.unsubscribe();
+    this.isPollingAnalysis.set(true);
+    this.analysisPollingSub = interval(5000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.appService.getLatestAnalysis(id))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            this.analysis.set(res);
+            this.analysisPollingSub?.unsubscribe();
+            this.isPollingAnalysis.set(false);
+          }
+        },
+        error: () => {
+          console.log('Analysis polling failed or not yet available');
+          this.isPollingAnalysis.set(false);
+          if (this.analysisPollingSub) this.analysisPollingSub.unsubscribe();
+        },
+      });
   }
 
   loadApplication(id: string | number) {

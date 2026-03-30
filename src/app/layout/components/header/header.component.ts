@@ -62,13 +62,6 @@ import { AuthService } from '../../../services/auth.service';
         <!-- Notification Dropdown -->
         <app-notification-dropdown></app-notification-dropdown>
 
-        <app-organization-logo
-          [name]="authStore.user()?.firstName"
-          size="md"
-          [rounded]="true"
-          class="hidden sm:block shadow-sm"
-        ></app-organization-logo>
-
         <!-- User Profile -->
         <div class="flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l border-gray-200">
           <!-- User Avatar -->

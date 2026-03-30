@@ -58,7 +58,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
     'company',
     'status',
     'risk',
-    'consistency',
+    'match',
     'actions',
   ];
 
@@ -66,8 +66,8 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
     searchTerm: '',
     minRisk: null as number | null,
     maxRisk: null as number | null,
-    minConsistency: null as number | null,
-    maxConsistency: null as number | null,
+    minMatch: null as number | null,
+    maxMatch: null as number | null,
   };
 
   isMobile = signal(false);
@@ -88,7 +88,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
               'company',
               'status',
               'risk',
-              'consistency',
+              'match',
               'actions',
             ];
         this.isMobile.set(result.matches);
@@ -125,12 +125,12 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
         if (!analysis || (analysis.overallRiskScore ?? 0) > this.filterValues.maxRisk) return false;
       }
 
-      if (this.filterValues.minConsistency != null) {
-        if (!analysis || (analysis.overallConsistencyScore ?? 0) < this.filterValues.minConsistency)
+      if (this.filterValues.minMatch != null) {
+        if (!analysis || (analysis.jobMatchScore ?? 0) < this.filterValues.minMatch)
           return false;
       }
-      if (this.filterValues.maxConsistency != null) {
-        if (!analysis || (analysis.overallConsistencyScore ?? 0) > this.filterValues.maxConsistency)
+      if (this.filterValues.maxMatch != null) {
+        if (!analysis || (analysis.jobMatchScore ?? 0) > this.filterValues.maxMatch)
           return false;
       }
 

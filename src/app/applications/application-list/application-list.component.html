@@ -47,21 +47,21 @@
           />
         </div>
 
-        <!-- Consistency Filter -->
+        <!-- Match Filter -->
         <div class="md:col-span-3 flex items-center gap-2">
           <input
             type="number"
-            [(ngModel)]="filterValues.minConsistency"
+            [(ngModel)]="filterValues.minMatch"
             (ngModelChange)="applyFilter()"
-            placeholder="Min Cons."
+            placeholder="Min Match"
             class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
           />
           <span class="text-black font-medium">-</span>
           <input
             type="number"
-            [(ngModel)]="filterValues.maxConsistency"
+            [(ngModel)]="filterValues.maxMatch"
             (ngModelChange)="applyFilter()"
-            placeholder="Max Cons."
+            placeholder="Max Match"
             class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
           />
         </div>
@@ -77,8 +77,8 @@
                 searchTerm: '',
                 minRisk: null,
                 maxRisk: null,
-                minConsistency: null,
-                maxConsistency: null,
+                minMatch: null,
+                maxMatch: null,
               };
               applyFilter()
             "
@@ -231,27 +231,27 @@
           </td>
         </ng-container>
 
-        <!-- Consistency Score -->
-        <ng-container matColumnDef="consistency">
+        <!-- Match Score -->
+        <ng-container matColumnDef="match">
           <th
             mat-header-cell
             *matHeaderCellDef
             mat-sort-header
             class="text-gray-600 font-semibold bg-gray-50/50"
           >
-            Consistency
+            Match
           </th>
           <td mat-cell *matCellDef="let app">
             <div *ngIf="app.latestAnalysis; else noAnalysis" class="w-24">
               <div class="flex items-center gap-2 mb-1">
-                <span class="text-xs font-bold text-indigo-600">
-                  {{ app.latestAnalysis.overallConsistencyScore }}%
+                <span class="text-xs font-bold text-teal-600">
+                  {{ app.latestAnalysis.jobMatchScore }}%
                 </span>
               </div>
               <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  class="h-full rounded-full bg-indigo-500 transition-all duration-500"
-                  [style.width.%]="app.latestAnalysis.overallConsistencyScore"
+                  class="h-full rounded-full bg-teal-500 transition-all duration-500"
+                  [style.width.%]="app.latestAnalysis.jobMatchScore"
                 ></div>
               </div>
             </div>
@@ -377,17 +377,17 @@
           </div>
           <div *ngIf="app.latestAnalysis">
             <span class="text-[10px] uppercase text-gray-400 font-bold tracking-wider"
-              >Consistency</span
+              >Match</span
             >
             <div class="flex items-center gap-2 mt-1">
               <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden flex-1">
                 <div
-                  class="h-full rounded-full bg-indigo-500 transition-all duration-500"
-                  [style.width.%]="app.latestAnalysis.overallConsistencyScore"
+                  class="h-full rounded-full bg-teal-500 transition-all duration-500"
+                  [style.width.%]="app.latestAnalysis.jobMatchScore"
                 ></div>
               </div>
               <span class="text-xs font-bold text-gray-700"
-                >{{ app.latestAnalysis.overallConsistencyScore }}%</span
+                >{{ app.latestAnalysis.jobMatchScore }}%</span
               >
             </div>
           </div>
