@@ -38,8 +38,8 @@ export class UserService {
     return this.api.get<User>(`/v1/users/${userId}`);
   }
 
-  getUsersByVendor(vendorId: string | number) {
-    return this.api.get<User[]>(`/v1/users/vendor/${vendorId}`);
+  getUsersByOrganization(orgId: string | number) {
+    return this.api.get<User[]>(`/v1/users/organization/${orgId}`);
   }
 
   createUser(data: CreateEmployeeRequest) {
@@ -106,5 +106,19 @@ export class UserService {
 
   getProfilePhoto(userId: string): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${userId}/profile-photo`, { responseType: 'blob' });
+  }
+
+  // ========== MY PROFILE ENDPOINTS ==========
+
+  getMe() {
+    return this.api.get<User>('/v1/users/me');
+  }
+
+  updateMe(data: { firstName: string; lastName: string; phone: string }) {
+    return this.api.put<User>('/v1/users/me', data);
+  }
+
+  changeMyPassword(data: { currentPassword: string; newPassword: string }) {
+    return this.api.post<void>('/v1/users/me/change-password', data);
   }
 }

@@ -61,6 +61,20 @@ import { Candidate } from '../../candidates/models/candidate.model';
             </div>
           </div>
           <p class="text-gray-500 mt-3 max-w-2xl">{{ project()?.description }}</p>
+          <div class="flex flex-wrap items-center gap-3 mt-4" *ngIf="project()?.requestId || project()?.billRate || project()?.payRate">
+            <div *ngIf="project()?.requestId" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
+              <i class="bi bi-tag text-gray-400"></i>
+              <span class="text-sm font-extrabold text-gray-700">Req: {{ project()?.requestId }}</span>
+            </div>
+            <div *ngIf="project()?.billRate" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-100">
+              <i class="bi bi-currency-dollar text-indigo-400"></i>
+              <span class="text-sm font-medium text-indigo-700">Bill: {{ project()?.billRate | currency }}</span>
+            </div>
+            <div *ngIf="project()?.payRate" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
+              <i class="bi bi-cash-stack text-emerald-400"></i>
+              <span class="text-sm font-medium text-emerald-700">Pay: {{ project()?.payRate | currency }}</span>
+            </div>
+          </div>
         </div>
         <button
           (click)="showAllocateModal = true"

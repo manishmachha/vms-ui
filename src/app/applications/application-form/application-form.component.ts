@@ -110,7 +110,7 @@ import { MatSelectModule } from '@angular/material/select';
               class="w-full rounded-xl border border-indigo-200 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all cursor-pointer"
             >
               <option [ngValue]="null">-- Create New Candidate --</option>
-              <option *ngFor="let c of candidates()" [value]="c.id">
+              <option *ngFor="let c of candidates()" [ngValue]="c.id">
                 {{ c.firstName }} {{ c.lastName }} ({{ c.email }})
               </option>
             </select>
@@ -457,7 +457,7 @@ export class ApplicationFormComponent implements OnInit {
     skills: [[]],
   });
 
-  candidateIdControl = this.fb.control<string | null>(null);
+  candidateIdControl = this.fb.control<number | string | null>(null);
 
   selectedFile: File | null = null;
   fileError = '';
@@ -485,7 +485,7 @@ export class ApplicationFormComponent implements OnInit {
     });
   }
 
-  onCandidateSelected(id: string | null) {
+  onCandidateSelected(id: number | string | null) {
     if (!id) {
       // Reset form or keep as is? Maybe clear fields to allow manual entry?
       // Let's keep it simple: if ID is null, we assume New Candidate, but don't clear explicitly unless we stored original values
@@ -493,7 +493,7 @@ export class ApplicationFormComponent implements OnInit {
       return;
     }
 
-    const candidate = this.candidates().find((c) => c.id === id);
+    const candidate = this.candidates().find((c) => String(c.id) === String(id));
     if (candidate) {
       this.form.patchValue({
         firstName: candidate.firstName,
@@ -513,7 +513,7 @@ export class ApplicationFormComponent implements OnInit {
   hasExistingResume(): boolean {
     const id = this.candidateIdControl.value;
     if (!id) return false;
-    const c = this.candidates().find((can) => can.id === id);
+    const c = this.candidates().find((can) => String(can.id) === String(id));
     return !!c?.resumeFilePath;
   }
 

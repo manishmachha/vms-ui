@@ -40,6 +40,10 @@ export const routes: Routes = [
         loadChildren: () => import('./applications/application.routes').then(m => m.APPLICATION_ROUTES)
       },
       {
+        path: 'interviews',
+        loadChildren: () => import('./interviews/interview.routes').then(m => m.INTERVIEW_ROUTES)
+      },
+      {
         path: 'track-applications',
         loadComponent: () => import('./applications/track-application-list/track-application-list.component').then(m => m.TrackApplicationListComponent)
       },
@@ -50,6 +54,14 @@ export const routes: Routes = [
       {
         path: 'vendors',
         loadChildren: () => import('./vendors/vendor.routes').then(m => m.VENDOR_ROUTES)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./notifications/notifications.component').then(m => m.NotificationsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./profile/my-profile.component').then(m => m.MyProfileComponent)
       }
     ]
   },

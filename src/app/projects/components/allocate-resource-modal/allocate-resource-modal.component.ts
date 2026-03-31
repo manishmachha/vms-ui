@@ -20,58 +20,10 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
   imports: [CommonModule, ReactiveFormsModule, ModalComponent],
   template: `
     <app-modal [isOpen]="isOpen" title="Allocate Resource" (isOpenChange)="onClose()">
-      <div
-        class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl -mx-6 -mt-4 mb-4"
-      >
-        <h3 class="text-lg font-bold text-gray-900">Allocate Resource</h3>
-        <button (click)="onClose()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-
       <form [formGroup]="allocateForm" (ngSubmit)="allocateUser()" class="space-y-5">
-        <!-- Resource Type Toggle -->
-        <div class="flex gap-4 p-1 bg-gray-100 rounded-lg">
-          <button
-            type="button"
-            (click)="setResourceType('EMPLOYEE')"
-            [class.bg-white]="resourceType === 'EMPLOYEE'"
-            [class.shadow-sm]="resourceType === 'EMPLOYEE'"
-            class="flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all"
-            [class.text-gray-900]="resourceType === 'EMPLOYEE'"
-            [class.text-gray-500]="resourceType !== 'EMPLOYEE'"
-          >
-            Employee
-          </button>
-          <button
-            type="button"
-            (click)="setResourceType('CANDIDATE')"
-            [class.bg-white]="resourceType === 'CANDIDATE'"
-            [class.shadow-sm]="resourceType === 'CANDIDATE'"
-            class="flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all"
-            [class.text-gray-900]="resourceType === 'CANDIDATE'"
-            [class.text-gray-500]="resourceType !== 'CANDIDATE'"
-          >
-            Candidate
-          </button>
-        </div>
 
-        <div *ngIf="resourceType === 'EMPLOYEE'">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Select Employee</label>
-          <div class="relative">
-            <select
-              formControlName="userId"
-              class="block w-full pl-3 pr-10 py-2.5 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg border bg-white"
-            >
-              <option value="">Choose a team member...</option>
-              <option *ngFor="let user of users" [value]="user.id">
-                {{ user.firstName }} {{ user.lastName }}
-              </option>
-            </select>
-          </div>
-        </div>
 
-        <div *ngIf="resourceType === 'CANDIDATE'">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Select Candidate</label>
           <div class="relative">
             <select
@@ -147,16 +99,7 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
       </form>
     </app-modal>
   `,
-  styles: [
-    `
-      /* Override modal header since we have a custom one inside the body content area to match design */
-      ::ng-deep
-        app-allocate-resource-modal
-        .px-6.py-4.border-b.border-gray-100.flex.items-center.justify-between.bg-gray-50\\/50 {
-        display: none !important;
-      }
-    `,
-  ],
+  styles: [],
 })
 export class AllocateResourceModalComponent implements OnChanges {
   @Input() isOpen = false;
@@ -171,11 +114,9 @@ export class AllocateResourceModalComponent implements OnChanges {
   private dialogService = inject(DialogService);
 
   isSaving = false;
-  resourceType: 'EMPLOYEE' | 'CANDIDATE' = 'EMPLOYEE';
 
   allocateForm = this.fb.group({
-    userId: [''],
-    candidateId: [''],
+    candidateId: ['', Validators.required],
     startDate: ['', Validators.required],
     percentage: [100, [Validators.required, Validators.min(0), Validators.max(100)]],
     billingRole: [''],
@@ -184,26 +125,7 @@ export class AllocateResourceModalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
       this.allocateForm.reset({ percentage: 100 });
-      this.setResourceType('EMPLOYEE');
     }
-  }
-
-  setResourceType(type: 'EMPLOYEE' | 'CANDIDATE') {
-    this.resourceType = type;
-    const userCtrl = this.allocateForm.get('userId');
-    const candCtrl = this.allocateForm.get('candidateId');
-
-    if (type === 'EMPLOYEE') {
-      userCtrl?.setValidators(Validators.required);
-      candCtrl?.clearValidators();
-      candCtrl?.setValue('');
-    } else {
-      candCtrl?.setValidators(Validators.required);
-      userCtrl?.clearValidators();
-      userCtrl?.setValue('');
-    }
-    userCtrl?.updateValueAndValidity();
-    candCtrl?.updateValueAndValidity();
   }
 
   allocateUser() {
@@ -211,9 +133,7 @@ export class AllocateResourceModalComponent implements OnChanges {
       this.isSaving = true;
       const val = this.allocateForm.value;
 
-      const candidateIdVal = this.resourceType === 'CANDIDATE'
-        ? Number(val.candidateId)
-        : Number(val.userId);
+      const candidateIdVal = Number(val.candidateId);
 
       const req: AllocateUserRequest = {
         candidateId: candidateIdVal,

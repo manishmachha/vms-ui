@@ -1,0 +1,280 @@
+.hub-banner {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    overflow: visible; /* Allow dropdowns to be visible */
+}
+
+.stat-card-container {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.stat-card {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-color: #e2e8f0;
+}
+
+/* Base Accent Bar */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #cbd5e1;
+    transition: width 0.3s ease;
+}
+
+.stat-card:hover::before {
+    width: 6px;
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover .icon-wrapper {
+    transform: scale(1.1);
+}
+
+/* Hover Items List */
+.hover-items-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    margin-top: 0.75rem;
+    padding: 1.25rem;
+    z-index: 1000;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.stat-card-container:hover .hover-items-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.list-header {
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.header-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.125em;
+}
+
+.list-content {
+    max-height: 240px;
+    overflow-y: auto;
+    margin-bottom: 0.875rem;
+    padding-right: 4px;
+}
+
+.hover-item {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.375rem;
+    background: #f8fafc;
+    border: 1px solid transparent;
+}
+
+.hover-item:hover {
+    background: #ffffff;
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.item-name {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-arrow {
+    font-size: 1.25rem;
+    color: #6366f1;
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.2s ease;
+}
+
+.hover-item:hover .item-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.list-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    cursor: pointer;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.list-footer:hover {
+    color: #4f46e5;
+}
+
+/* Custom Scrollbar for list */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-count {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.075em;
+    font-weight: 600;
+    margin-top: 0.125rem;
+}
+
+/* Accent Colors */
+
+/* Indigo: Candidates */
+.accent-indigo::before { background: #6366f1; }
+.accent-indigo .icon-wrapper { background: #eef2ff; color: #4f46e5; }
+.accent-indigo:hover { border-color: #c7d2fe; }
+
+/* Emerald: Applications */
+.accent-emerald::before { background: #10b981; }
+.accent-emerald .icon-wrapper { background: #ecfdf5; color: #059669; }
+.accent-emerald:hover { border-color: #a7f3d0; }
+
+/* Blue: Jobs */
+.accent-blue::before { background: #3b82f6; }
+.accent-blue .icon-wrapper { background: #eff6ff; color: #2563eb; }
+.accent-blue:hover { border-color: #bfdbfe; }
+
+/* Rose: Interviews */
+.accent-rose::before { background: #f43f5e; }
+.accent-rose .icon-wrapper { background: #fff1f2; color: #e11d48; }
+.accent-rose:hover { border-color: #fecdd3; }
+
+/* Violet: Projects */
+.accent-violet::before { background: #8b5cf6; }
+.accent-violet .icon-wrapper { background: #f5f3ff; color: #7c3aed; }
+.accent-violet:hover { border-color: #ddd6fe; }
+
+/* Cyan: Clients */
+.accent-cyan::before { background: #06b6d4; }
+.accent-cyan .icon-wrapper { background: #ecfeff; color: #0891b2; }
+.accent-cyan:hover { border-color: #a5f3fc; }
+
+/* Slate: Vendors */
+.accent-slate::before { background: #64748b; }
+.accent-slate .icon-wrapper { background: #f1f5f9; color: #475569; }
+.accent-slate:hover { border-color: #cbd5e1; }
+
+/* Custom scrollbar for horizontal overflow */
+.hub-banner::-webkit-scrollbar {
+    height: 5px;
+}
+
+.hub-banner::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.hub-banner::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.hub-banner::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

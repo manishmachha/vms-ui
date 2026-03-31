@@ -14,7 +14,7 @@ import { OrganizationLogoComponent } from '../organization-logo/organization-log
 import { NotificationCounts, NotificationService } from '../../../services/notification.service';
 import { AuthStore } from '../../../services/auth.store';
 
-export type UserRole = 'SUPER_ADMIN' | 'MANAGER' | 'ADMIN' | 'TA' | 'EMPLOYEE' | 'VENDOR';
+export type UserRole = 'SUPER_ADMIN' | 'MANAGER' | 'ADMIN' | 'TALENT_ACQUISITION' | 'EMPLOYEE' | 'VENDOR';
 export type OrganizationType = 'SOLVENTEK' | 'VENDOR';
 
 interface MenuItem {
@@ -226,14 +226,14 @@ export class SidebarComponent implements OnInit {
           label: 'Overview',
           route: '/dashboard',
           icon: 'bi bi-speedometer2',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA', 'EMPLOYEE', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'EMPLOYEE', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
           label: 'Users',
           route: '/users/',
           icon: 'bi bi-building',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
         }
       ],
@@ -249,13 +249,6 @@ export class SidebarComponent implements OnInit {
           roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'ORGANIZATION',
-        },
-        {
-          label: 'Create Vendor',
-          route: '/vendors/create',
-          icon: 'bi bi-plus-circle',
-          roles: ['SUPER_ADMIN', 'MANAGER'],
-          orgTypes: ['SOLVENTEK'],
         }
       ],
     },
@@ -267,7 +260,7 @@ export class SidebarComponent implements OnInit {
           label: 'Jobs',
           route: '/jobs',
           icon: 'bi bi-briefcase-fill',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
           notificationCategory: 'JOB',
         },
@@ -275,16 +268,23 @@ export class SidebarComponent implements OnInit {
           label: 'Candidates',
           route: '/candidates',
           icon: 'bi bi-person-badge',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
           label: 'Applications',
           route: '/applications',
           icon: 'bi bi-file-earmark-text',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'APPLICATION',
+        },
+        {
+          label: 'Interviews',
+          route: '/interviews',
+          icon: 'bi bi-calendar-event',
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
+          orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
           label: 'Track Applications',
@@ -304,14 +304,14 @@ export class SidebarComponent implements OnInit {
           label: 'Clients',
           route: '/clients',
           icon: 'bi bi-briefcase',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
         },
         {
           label: 'Projects',
           route: '/projects',
           icon: 'bi bi-kanban',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TA'],
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'PROJECT',
         },
@@ -421,7 +421,7 @@ export class SidebarComponent implements OnInit {
     if (role === 'SUPER_ADMIN') return 'badge-danger';
     if (role === 'MANAGER') return 'badge-warning';
     if (role === 'ADMIN') return 'badge-primary';
-    if (role === 'TA') return 'badge-info';
+    if (role === 'TALENT_ACQUISITION') return 'badge-info';
     if (role === 'VENDOR') return 'badge-success';
     return 'badge-primary';
   }

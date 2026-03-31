@@ -6,7 +6,6 @@ import { ProjectService, UpdateStatusRequest } from '../../services/project.serv
 import { Project } from '../../models/project.model';
 import { Client } from '../../models/client.model';
 import { ClientService } from '../../services/client.service';
-import { Organization } from '../../models/auth.model';
 import { OrganizationService } from '../../services/organization.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderService } from '../../services/header.service';
@@ -216,6 +215,11 @@ import { AddProjectModalComponent } from '../components/add-project-modal/add-pr
                   >{{ project.startDate | date: 'mediumDate' }} -
                   {{ project.endDate ? (project.endDate | date: 'mediumDate') : 'Ongoing' }}</span
                 >
+              </div>
+              <div class="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-gray-100/50" *ngIf="project.requestId || project.billRate || project.payRate">
+                <span *ngIf="project.requestId" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-extrabold bg-gray-100 text-gray-800 border-gray-200">Req: {{ project.requestId }}</span>
+                <span *ngIf="project.billRate" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border-indigo-200">Bill: {{ project.billRate | currency }}</span>
+                <span *ngIf="project.payRate" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border-emerald-200">Pay: {{ project.payRate | currency }}</span>
               </div>
             </div>
 

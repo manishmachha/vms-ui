@@ -84,7 +84,7 @@ export class CandidateFormComponent {
         // We can redirect to edit mode for this new candidate to allow user verification.
         this.uploading.set(false);
         this.parsing.set(false);
-        this.router.navigate(['/candidates/edit', candidate.id]);
+        this.router.navigate(['/candidates']);
       },
       error: (err) => {
         console.error('Upload failed', err);
@@ -121,16 +121,17 @@ export class CandidateFormComponent {
         error: () => this.saving.set(false),
       });
     } else {
-      // Manual creation not fully implemented in plan (plan focused on upload),
-      // but logic handles update.
-      // If we want manual create without resume, we need a backend endpoint for pure create.
-      // DTO supports it, modify service valid.
-      console.warn(
-        'Manual creation without resume not yet wired for API, only Upload implemented for Create.',
-      );
-      // Just showing error or fallback for now.
-      this.uploadError.set('Please upload a resume to create a candidate.');
-      this.saving.set(false);
+      this.candidateService.createManual(payload).subscribe({
+        next: (candidate) => {
+          this.saving.set(false);
+          this.router.navigate(['/candidates']);
+        },
+        error: (err) => {
+          console.error('Manual creation failed', err);
+          this.uploadError.set('Failed to create candidate manually.');
+          this.saving.set(false);
+        },
+      });
     }
   }
 }

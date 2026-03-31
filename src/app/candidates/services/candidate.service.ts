@@ -4,6 +4,7 @@ import { Candidate } from '../models/candidate.model';
 import { Observable } from 'rxjs';
 import { JobApplication } from '../../models/application.model';
 import { Interview } from '../../models/interview.model';
+import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +43,13 @@ export class CandidateService {
   }
 
   /**
+   * Create a candidate manually (without resume)
+   */
+  createManual(data: Partial<Candidate>): Observable<Candidate> {
+    return this.api.post<Candidate>(`${this.BASE_URL}/manual`, data);
+  }
+
+  /**
    * Update candidate details
    */
   updateCandidate(id: string, data: Partial<Candidate>): Observable<Candidate> {
@@ -72,5 +80,9 @@ export class CandidateService {
 
   getCandidateInterviews(id: string): Observable<Interview[]> {
     return this.api.get<Interview[]>(`${this.BASE_URL}/${id}/interviews`);
+  }
+
+  getDashboardStats(id: string): Observable<DashboardStatsResponse> {
+    return this.api.get<DashboardStatsResponse>(`${this.BASE_URL}/${id}/dashboard-stats`);
   }
 }
