@@ -93,10 +93,10 @@ jobs:
             cd $DEPLOY_DIR
             
             # Pull only frontend image
-            docker compose -f docker-compose.prod.yml pull frontend
+            docker-compose -f docker-compose.prod.yml pull frontend
             
             # Recreate frontend container
-            docker compose -f docker-compose.prod.yml up -d frontend
+            docker-compose -f docker-compose.prod.yml up -d frontend
             
             # Cleanup old images
             docker image prune -f
