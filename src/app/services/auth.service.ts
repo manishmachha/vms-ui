@@ -3,7 +3,7 @@ import { AuthStore } from './auth.store';
 import { User, AuthResponse, ApiResponse } from '../models/auth.model';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',

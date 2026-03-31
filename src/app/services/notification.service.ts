@@ -4,7 +4,7 @@ import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Page } from '../models/page.model';
 import { ApiResponse } from '../models/auth.model';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '../../environments/environment';
 
 export interface Notification {
   id: number;

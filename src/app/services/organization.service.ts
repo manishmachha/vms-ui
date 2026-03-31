@@ -4,7 +4,7 @@ import { ApiService } from './api.service';
 import { ApiResponse, Organization, Vendor } from '../models/organization.model';
 import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
 
 @Injectable({

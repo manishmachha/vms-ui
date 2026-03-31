@@ -11,7 +11,7 @@ export interface HeaderState {
 })
 export class HeaderService {
   private state = signal<HeaderState>({
-    title: 'Silverwind',
+    title: 'VMS',
     subtitle: 'Enterprise Portal',
     icon: 'bi bi-wind',
   });
@@ -26,7 +26,7 @@ export class HeaderService {
 
   reset() {
     this.state.set({
-      title: 'Silverwind',
+      title: 'VMS',
       subtitle: 'Enterprise Portal',
       icon: 'bi bi-wind',
     });

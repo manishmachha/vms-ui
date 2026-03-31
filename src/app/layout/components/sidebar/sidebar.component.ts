@@ -14,7 +14,13 @@ import { OrganizationLogoComponent } from '../organization-logo/organization-log
 import { NotificationCounts, NotificationService } from '../../../services/notification.service';
 import { AuthStore } from '../../../services/auth.store';
 
-export type UserRole = 'SUPER_ADMIN' | 'MANAGER' | 'ADMIN' | 'TALENT_ACQUISITION' | 'EMPLOYEE' | 'VENDOR';
+export type UserRole =
+  | 'SUPER_ADMIN'
+  | 'MANAGER'
+  | 'ADMIN'
+  | 'TALENT_ACQUISITION'
+  | 'EMPLOYEE'
+  | 'VENDOR';
 export type OrganizationType = 'SOLVENTEK' | 'VENDOR';
 
 interface MenuItem {
@@ -235,7 +241,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-building',
           roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
-        }
+        },
       ],
     },
     {
@@ -249,7 +255,7 @@ export class SidebarComponent implements OnInit {
           roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'ORGANIZATION',
-        }
+        },
       ],
     },
     {
@@ -315,23 +321,22 @@ export class SidebarComponent implements OnInit {
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'PROJECT',
         },
-
       ],
     },
-
   ];
 
   constructor() {
     // Recompute visible sections whenever user/role changes
-    effect(
-      () => {
-        const role = this.authStore.userRole();
-        const user = this.authStore.user();
-        if (role && user) {
-          this.calculateVisibleSections(role as UserRole, (this.authStore.orgType() || 'SOLVENTEK') as OrganizationType);
-        }
-      },
-    );
+    effect(() => {
+      const role = this.authStore.userRole();
+      const user = this.authStore.user();
+      if (role && user) {
+        this.calculateVisibleSections(
+          role as UserRole,
+          (this.authStore.orgType() || 'SOLVENTEK') as OrganizationType,
+        );
+      }
+    });
   }
 
   ngOnInit() {
@@ -386,9 +391,9 @@ export class SidebarComponent implements OnInit {
 
   getOrgName(): string {
     const orgType = this.authStore.orgType();
-    if (orgType === 'SOLVENTEK') return 'Silverwind';
+    if (orgType === 'SOLVENTEK') return 'VMS';
     if (orgType === 'VENDOR') return 'Vendor Portal';
-    return 'Silverwind';
+    return 'VMS';
   }
 
   getPortalType(): string {
