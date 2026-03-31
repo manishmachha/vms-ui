@@ -6,12 +6,32 @@ export interface Interview {
   applicationId: number;
   application?: {
     id: number;
+    job?: {
+      id: number;
+      title: string;
+      description?: string;
+      requirements?: string;
+      experience?: string;
+      skills?: string;
+      location?: string | null;
+      status?: string;
+      employmentType?: string;
+      organization?: {
+        id: number;
+        name: string;
+      };
+    };
     candidate?: {
+      id: number;
       firstName: string;
       lastName: string;
+      email: string;
+      phone: string;
     };
-    job?: {
-      title: string;
+    status?: string;
+    vendor?: {
+      id: number;
+      name: string;
     };
   };
   interviewerId: number;
@@ -19,6 +39,10 @@ export interface Interview {
     id: number;
     firstName: string;
     lastName: string;
+    email?: string;
+    phone?: string;
+    role?: string;
+    type?: string;
   };
   scheduledAt: string;
   durationMinutes: number;

@@ -54,6 +54,14 @@ export const routes: Routes = [
       {
         path: 'vendors',
         loadChildren: () => import('./vendors/vendor.routes').then(m => m.VENDOR_ROUTES)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./notifications/notifications.component').then(m => m.NotificationsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./profile/my-profile.component').then(m => m.MyProfileComponent)
       }
     ]
   },

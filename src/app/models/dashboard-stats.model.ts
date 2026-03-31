@@ -3,6 +3,7 @@ export interface StatItem {
     count: number;
     icon: string;
     route: string;
+    items?: { id: number; name: string }[];
 }
 
 export interface DashboardStatsResponse {

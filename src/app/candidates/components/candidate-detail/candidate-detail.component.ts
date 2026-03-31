@@ -12,8 +12,6 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { JobApplication } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
-import { Subscription, interval } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
 import { HubDashboardBannerComponent } from '../../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
 import { DashboardStatsResponse } from '../../../models/dashboard-stats.model';
 
@@ -873,58 +871,46 @@ export class CandidateDetailComponent implements OnInit {
   showDeleteConfirm = signal(false);
   showArchiveConfirm = signal(false);
 
-  private pollingSub?: Subscription;
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
-        this.startPolling(id);
+        this.loadCandidate(id);
       }
     });
   }
 
-  ngOnDestroy() {
-    if (this.pollingSub) {
-      this.pollingSub.unsubscribe();
-    }
-  }
-
-  startPolling(id: string) {
-    if (this.pollingSub) this.pollingSub.unsubscribe();
-    
-    this.pollingSub = interval(5000)
-      .pipe(
-        startWith(0),
-        switchMap(() => this.candidateService.getCandidate(id))
-      )
-      .subscribe({
-        next: (c) => {
-          this.candidate.set(c);
-          
-          if (c.aiAnalysisJson && c.email !== 'Processing...') {
-            this.pollingSub?.unsubscribe();
-          }
-
-          if (this.applications().length === 0) this.loadApplications(c.id);
-          if (this.interviews().length === 0) this.loadInterviews(c.id);
-          
-          // Load dashboard stats
-          if (!this.dashboardStats()) {
-            this.candidateService.getDashboardStats(c.id).subscribe({
-              next: stats => this.dashboardStats.set(stats),
-              error: err => console.error('Failed to load dashboard stats', err)
-            });
-          }
-
-          if (!this.brandedResume()) {
-            this.loadBrandedResume(c.id);
-          } else if (this.brandedResume()?.status === 'GENERATING') {
-            this.loadBrandedResume(c.id);
-          }
-        },
-        error: (err) => console.error('Failed to load candidate', err),
-      });
+  loadCandidate(id: string) {
+    this.candidateService.getCandidate(id).subscribe({
+      next: (c) => {
+        this.candidate.set(c);
+        
+        this.loadApplications(c.id);
+        this.loadInterviews(c.id);
+        this.loadBrandedResume(c.id);
+        
+        // Load dashboard stats
+        this.candidateService.getDashboardStats(c.id).subscribe({
+          next: stats => {
+            if (c.organization && stats?.stats) {
+              stats.stats = stats.stats.map(s => {
+                if (s.label.toLowerCase().includes('vendor')) {
+                  if (!s.items) s.items = [];
+                  if (!s.items.find(i => i.id === Number(c.organization!.id))) {
+                    s.items = [{ id: Number(c.organization!.id), name: c.organization!.name }, ...s.items];
+                  }
+                }
+                return s;
+              });
+            }
+            this.dashboardStats.set(stats);
+          },
+          error: err => console.error('Failed to load dashboard stats', err)
+        });
+      },
+      error: (err) => console.error('Failed to load candidate', err),
+    });
   }
 
 

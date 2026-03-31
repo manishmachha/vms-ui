@@ -9,9 +9,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -35,7 +35,7 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatTooltipModule,
+    MatProgressSpinnerModule,
     MatTooltipModule,
     FormsModule,
     OrganizationLogoComponent,
@@ -46,21 +46,9 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   private headerService = inject(HeaderService);
   private appService = inject(ApplicationService);
   private router = inject(Router);
-  private breakpointObserver = inject(BreakpointObserver);
   private notificationService = inject(NotificationService);
-
   dataSource = new MatTableDataSource<JobApplication>([]);
   unreadAppIds = new Set<string>();
-  displayedColumns: string[] = [
-    'candidate',
-    'job',
-    'experience',
-    'company',
-    'status',
-    'risk',
-    'match',
-    'actions',
-  ];
 
   filterValues = {
     searchTerm: '',
@@ -75,25 +63,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor() {
-    this.breakpointObserver
-      .observe([Breakpoints.Handset, Breakpoints.TabletPortrait])
-      .subscribe((result) => {
-        this.displayedColumns = result.matches
-          ? ['candidate', 'job', 'status', 'actions']
-          : [
-              'candidate',
-              'job',
-              'experience',
-              'company',
-              'status',
-              'risk',
-              'match',
-              'actions',
-            ];
-        this.isMobile.set(result.matches);
-      });
-  }
+  constructor() {}
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -140,7 +110,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
 
   loadUnreadAppIds() {
     this.notificationService.getUnreadEntityIds('APPLICATION').subscribe({
-      next: (ids) => (this.unreadAppIds = new Set(ids.map(String))),
+      next: (ids: (string | number)[]) => (this.unreadAppIds = new Set(ids.map(String))),
       error: () => (this.unreadAppIds = new Set()),
     });
   }

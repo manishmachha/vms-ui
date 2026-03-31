@@ -35,7 +35,6 @@ import { InterviewService } from '../../services/interview.service';
 import { UserService } from '../../services/user.service';
 import { Interview, InterviewType } from '../../models/interview.model';
 import { ChangeDetectorRef } from '@angular/core';
-import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Component({
@@ -55,7 +54,6 @@ import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
     BaseChartDirective,
     OrganizationLogoComponent,
     ClientSubmissionsComponent,
-    HubDashboardBannerComponent,
   ],
   templateUrl: './application-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -374,12 +372,6 @@ export class ApplicationDetailComponent implements OnInit {
         if (app.candidate?.id) {
           this.loadBrandedResume(app.candidate.id);
         }
-
-        // Load dashboard stats
-        this.appService.getDashboardStats(id).subscribe({
-          next: stats => this.dashboardStats.set(stats),
-          error: err => console.error('Failed to load dashboard stats', err)
-        });
 
         if (app.candidate?.organization?.id) {
           this.loadPotentialCcUsers(Number(app.candidate.organization.id));

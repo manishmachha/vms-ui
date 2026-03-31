@@ -28,7 +28,6 @@ import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
     MatSelectModule,
     OrganizationLogoComponent,
     FormsModule,
-    RouterLink,
     HubDashboardBannerComponent,
   ],
   template: `
@@ -138,97 +137,7 @@ import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
           </div>
         </div>
 
-        <!-- Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- LEFT COLUMN: Jobs (Public) or details -->
-          <div class="lg:col-span-2 space-y-6">
-            <!-- Public Job Listings -->
-            <div *ngIf="jobs().length > 0 || searchQuery()" class="space-y-4">
-              <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-gray-900">
-                  Open Opportunities
-                  <span
-                    class="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full ml-2"
-                    >{{ filteredJobs().length }}</span
-                  >
-                </h2>
-                <!-- Simple Sort/Search could go here -->
-              </div>
-
-              <!-- Toolbar -->
-              <div
-                class="flex flex-col sm:flex-row gap-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm"
-              >
-                <div class="relative flex-1">
-                  <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
-                    >search</mat-icon
-                  >
-                  <input
-                    type="text"
-                    [ngModel]="searchQuery()"
-                    (ngModelChange)="onSearchChange($event)"
-                    placeholder="Search jobs..."
-                    class="w-full pl-9 pr-3 py-2 bg-gray-50 border-0 rounded-lg text-sm focus:ring-2 focus:ring-indigo-100"
-                  />
-                </div>
-                <select
-                  [ngModel]="sortOrder()"
-                  (ngModelChange)="onSortChange($event)"
-                  class="bg-gray-50 border-0 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-indigo-100 cursor-pointer"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                </select>
-              </div>
-
-              <div class="space-y-3">
-                <div
-                  *ngFor="let job of paginatedJobs()"
-                  [routerLink]="['/jobs', job.id]"
-                  class="bg-white p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer group"
-                >
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <h3
-                        class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors"
-                      >
-                        {{ job.title }}
-                      </h3>
-                      <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                        <span class="flex items-center gap-1"
-                          ><mat-icon class="text-sm align-middle">work_outline</mat-icon>
-                          {{ job.employmentType }}</span
-                        >
-                      </div>
-                    </div>
-                    <span class="badge" [ngClass]="getJobTypeBadge(job.employmentType)">{{
-                      job.employmentType
-                    }}</span>
-                  </div>
-                  <p class="text-gray-500 text-sm mt-3 line-clamp-2">{{ job.description }}</p>
-                </div>
-              </div>
-              <!-- Pagination -->
-              <div *ngIf="totalPages() > 1" class="flex justify-center gap-2 mt-4">
-                <button
-                  (click)="setPage(currentPage() - 1)"
-                  [disabled]="currentPage() === 1"
-                  class="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <mat-icon>chevron_left</mat-icon>
-                </button>
-                <span class="py-2 px-4 text-sm font-medium"
-                  >Page {{ currentPage() }} of {{ totalPages() }}</span
-                >
-                <button
-                  (click)="setPage(currentPage() + 1)"
-                  [disabled]="currentPage() === totalPages()"
-                  class="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <mat-icon>chevron_right</mat-icon>
-                </button>
-              </div>
-            </div>
+        
 
             <!-- About Section -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -237,17 +146,6 @@ import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
                 <p>Official vendor information and active job postings.</p>
               </div>
             </div>
-          </div>
-
-          <!-- RIGHT COLUMN: Contact & Business Details -->
-          <div class="space-y-6">
-
-
-            <!-- Note: Re-using the lower contact card for completeness, even if duplicated in header, as it has grouping -->
-          </div>
-        </div>
-      </ng-container>
-    </div>
   `,
   styles: [
     `
@@ -386,81 +284,6 @@ export class VendorDetailComponent implements OnInit {
           },
         });
       }
-    }
-  }
-
-  // --- Job Listing Logic ---
-
-  filteredJobs = computed(() => {
-    let result = [...this.jobs()];
-    const query = this.searchQuery();
-    const sort = this.sortOrder();
-
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      result = result.filter(
-        (j) => (j.title?.toLowerCase().includes(q) || (j.description || '').toLowerCase().includes(q)),
-      );
-    }
-
-    result.sort((a, b) => {
-      switch (sort) {
-        case 'title_asc':
-          return a.title.localeCompare(b.title);
-        case 'title_desc':
-          return b.title.localeCompare(a.title);
-        case 'oldest':
-          return (a.createdAt || '').localeCompare(b.createdAt || '');
-        case 'newest':
-        default:
-          return (b.createdAt || '').localeCompare(a.createdAt || '');
-      }
-    });
-
-    return result;
-  });
-
-  paginatedJobs = computed(() => {
-    const page = this.currentPage();
-    const start = (page - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.filteredJobs().slice(start, end);
-  });
-
-  totalPages = computed(() => Math.ceil(this.filteredJobs().length / this.pageSize));
-
-  setPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-    }
-  }
-
-  onSearchChange(value: string) {
-    this.searchQuery.set(value);
-    this.currentPage.set(1);
-  }
-
-  onSortChange(value: string) {
-    this.sortOrder.set(value);
-    this.currentPage.set(1);
-  }
-
-  resetFilters() {
-    this.searchQuery.set('');
-    this.sortOrder.set('newest');
-    this.currentPage.set(1);
-  }
-
-  getJobTypeBadge(type?: string): string {
-    switch (type) {
-      case 'FULL_TIME':
-        return 'badge-success';
-      case 'CONTRACT':
-        return 'badge-warning';
-      case 'PART_TIME':
-        return 'badge-info';
-      default:
-        return 'badge-primary';
     }
   }
 }

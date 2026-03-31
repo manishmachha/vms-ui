@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { InterviewService } from '../../services/interview.service';
 import { Interview } from '../../models/interview.model';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthStore } from '../../services/auth.store';
 
 @Component({
   selector: 'app-interview-list',
@@ -183,6 +184,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class InterviewListComponent implements OnInit {
   private interviewService = inject(InterviewService);
+  private authStore = inject(AuthStore);
 
   loading = signal(true);
   searchQuery = '';
@@ -208,7 +210,11 @@ export class InterviewListComponent implements OnInit {
 
   loadInterviews() {
     this.loading.set(true);
-    this.interviewService.getAllInterviews().subscribe({
+    const fetchObservable = this.authStore.isVendor()
+      ? this.interviewService.getVendorInterviews()
+      : this.interviewService.getAllInterviews();
+
+    fetchObservable.subscribe({
       next: (res) => {
         this.interviews.set(res || []);
         this.updateStats(res || []);

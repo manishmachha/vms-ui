@@ -1,13 +1,36 @@
 <div class="hub-banner">
     @for (item of stats; track item.label) {
-        <div class="stat-card" [ngClass]="getAccentClass(item.label)" (click)="navigateTo(item.route)">
-            <div class="icon-wrapper">
-                <i [class]="'bi ' + item.icon"></i>
+        <div class="stat-card-container">
+            <div class="stat-card" [ngClass]="getAccentClass(item.label)" (click)="navigateTo(item.route)">
+                <div class="icon-wrapper">
+                    <i [class]="'bi ' + item.icon"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-count">{{ item.count }}</span>
+                    <span class="stat-label">{{ item.label }}</span>
+                </div>
             </div>
-            <div class="stat-info">
-                <span class="stat-count">{{ item.count }}</span>
-                <span class="stat-label">{{ item.label }}</span>
-            </div>
+
+            <!-- Hover Items List -->
+            @if (item.items && item.items.length > 0) {
+                <div class="hover-items-list animate-slide-up">
+                    <div class="list-header">
+                        <span class="header-label">Recent {{ item.label }}</span>
+                    </div>
+                    <div class="list-content custom-scrollbar">
+                        @for (subItem of item.items; track subItem.id) {
+                            <div class="hover-item" (click)="navigateToItem(subItem.id, item.route, $event)">
+                                <span class="item-name">{{ subItem.name }}</span>
+                                <i class="bi bi-arrow-right-short item-arrow"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="list-footer" (click)="navigateTo(item.route)">
+                        <span>View All</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </div>
+                </div>
+            }
         </div>
     }
 </div>

@@ -1,9 +1,7 @@
 import { Component, OnInit, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -19,6 +17,7 @@ import { ApplicationService } from '../../services/application.service';
 import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { JobApplication, ApplicationStatus } from '../../models/application.model';
+import { MatTableDataSource } from '@angular/material/table';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 
 @Component({
@@ -27,9 +26,7 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
   imports: [
     CommonModule,
     RouterLink,
-    MatTableModule,
     MatPaginatorModule,
-    MatSortModule,
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
@@ -106,254 +103,131 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
           </div>
         </div>
 
-        <!-- TABLE VIEW (DESKTOP) -->
-        <div class="hidden md:block overflow-x-auto">
-          <table mat-table [dataSource]="dataSource" matSort class="w-full">
-            <!-- Job Title Column -->
-            <ng-container matColumnDef="jobTitle">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                class="pl-6! text-gray-600 font-semibold bg-gray-50/50"
-              >
-                Role
-              </th>
-              <td mat-cell *matCellDef="let app" class="pl-6!">
-                <div class="flex items-center gap-3 py-3">
-                  <div *ngIf="hasNotification(app.id)" class="relative flex h-2.5 w-2.5 shrink-0">
-                    <span
-                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-                    ></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-semibold text-gray-900 leading-tight">{{
-                      app.job.title
-                    }}</span>
-                    <span class="text-xs text-gray-500">ID: #{{ app.job.id }}</span>
-                  </div>
-                </div>
-              </td>
-            </ng-container>
+        <!-- DATA VIEW (CARD GRID) -->
+        <div class="bg-gray-50/30 p-6">
+          <div
+            *ngIf="!loading() && dataSource.filteredData.length > 0"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            <div
+              *ngFor="let app of dataSource.connect() | async"
+              class="card-modern bg-white p-5 flex flex-col gap-5 relative group hover:border-indigo-100 transition-all border border-gray-100 shadow-sm"
+              [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-100/50 border-red-200' : ''"
+              [routerLink]="['/applications', app.id]"
+            >
+              <!-- Notification Indicator -->
+              <div *ngIf="hasNotification(app.id)" class="absolute top-4 right-4 z-10">
+                <span class="flex h-3 w-3">
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                  ></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+              </div>
 
-            <!-- Applicant Column -->
-            <ng-container matColumnDef="applicant">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                class="text-gray-600 font-semibold bg-gray-50/50"
-              >
-                Applicant
-              </th>
-              <td mat-cell *matCellDef="let app">
-                <div class="flex flex-col">
-                  <span class="font-medium text-gray-900"
-                    >{{ app.candidate?.firstName }} {{ app.candidate?.lastName }}</span
+              <!-- Job & Company -->
+              <div class="flex items-start gap-4">
+                <app-organization-logo
+                  [org]="app.job.organization"
+                  size="sm"
+                  [rounded]="true"
+                  class="shrink-0"
+                ></app-organization-logo>
+                <div class="min-w-0">
+                  <h3
+                    class="font-bold text-gray-900 leading-tight truncate group-hover:text-indigo-600 transition-colors"
                   >
-                  <span class="text-xs text-gray-500">{{ app.candidate?.email }}</span>
+                    {{ app.job.title }}
+                  </h3>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                      >#{{ app.job.id }}</span
+                    >
+                    <span class="text-gray-300">•</span>
+                    <span class="text-xs font-medium text-gray-500 truncate">{{
+                      app.job.organization?.name || 'Unknown'
+                    }}</span>
+                  </div>
                 </div>
-              </td>
-            </ng-container>
+              </div>
 
-            <!-- Company Column -->
-            <ng-container matColumnDef="company">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                class="text-gray-600 font-semibold bg-gray-50/50"
-              >
-                Company
-              </th>
-              <td mat-cell *matCellDef="let app">
+              <!-- Applicant Details -->
+              <div class="bg-gray-50/50 rounded-2xl p-4 space-y-3">
                 <div class="flex items-center gap-3">
-                  <app-organization-logo
-                    [org]="app.job.organization"
-                    size="sm"
-                    [rounded]="true"
-                  ></app-organization-logo>
-                  <span class="font-medium text-gray-700">{{
-                    app.job.organization?.name || 'Unknown'
-                  }}</span>
+                  <div
+                    class="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-indigo-500 shadow-sm"
+                  >
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
+                      Applicant
+                    </p>
+                    <p class="text-sm font-bold text-gray-900 truncate">
+                      {{ app.candidate?.firstName }} {{ app.candidate?.lastName }}
+                    </p>
+                  </div>
                 </div>
-              </td>
-            </ng-container>
-
-            <!-- Applied Date Column -->
-            <ng-container matColumnDef="createdAt">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                class="text-gray-600 font-semibold bg-gray-50/50"
-              >
-                Applied On
-              </th>
-              <td mat-cell *matCellDef="let app" class="text-gray-600">
-                <div class="flex items-center gap-2">
-                  <i class="bi bi-calendar3 text-gray-400"></i>
-                  <span>{{ app.createdAt | date: 'mediumDate' }}</span>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400 shadow-sm"
+                  >
+                    <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
+                      Email address
+                    </p>
+                    <p class="text-xs font-medium text-gray-500 truncate">
+                      {{ app.candidate?.email }}
+                    </p>
+                  </div>
                 </div>
-              </td>
-            </ng-container>
+              </div>
 
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                class="text-gray-600 font-semibold bg-gray-50/50"
-              >
-                Status
-              </th>
-              <td mat-cell *matCellDef="let app">
+              <!-- Status & Date -->
+              <div class="flex items-center justify-between gap-2 mt-auto">
+                <div class="flex flex-col">
+                  <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tight mb-1"
+                    >Applied On</span
+                  >
+                  <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                    <i class="bi bi-calendar3 text-gray-400"></i>
+                    {{ app.createdAt | date: 'mediumDate' }}
+                  </div>
+                </div>
                 <span
                   [class]="
                     getStatusClass(app.status) +
-                    ' px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border w-fit block'
+                    ' px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border'
                   "
                 >
                   {{ formatStatus(app.status) }}
                 </span>
-              </td>
-            </ng-container>
-
-            <!-- Action Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="pr-6! bg-gray-50/50 text-right"></th>
-              <td mat-cell *matCellDef="let app" class="pr-6! text-right">
-                <a
-                  [routerLink]="['/applications', app.id]"
-                  class="text-gray-400 hover:text-indigo-600 transition-colors p-2 inline-flex"
-                  matTooltip="View Details"
-                >
-                  <mat-icon>chevron_right</mat-icon>
-                </a>
-              </td>
-            </ng-container>
-
-            <tr
-              mat-header-row
-              *matHeaderRowDef="displayedColumns"
-              class="h-12 border-b border-gray-100"
-            ></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              class="transition-colors cursor-pointer border-b border-gray-50 h-20"
-              [ngClass]="
-                hasNotification(row.id)
-                  ? 'bg-red-50/50 ring-1 ring-red-200 hover:bg-red-100/50'
-                  : 'hover:bg-indigo-50/30'
-              "
-            ></tr>
-
-            <!-- Empty State -->
-            <tr class="mat-row" *matNoDataRow>
-              <td class="mat-cell p-12 text-center" colspan="6">
-                <div class="flex flex-col items-center justify-center text-gray-400">
-                  <mat-icon class="text-4xl mb-2 opacity-20">search_off</mat-icon>
-                  <h3 class="text-lg font-bold text-gray-900">No applications found</h3>
-                  <p class="mt-1 text-gray-500">Try adjusting your search or filters</p>
-                  <button
-                    (click)="clearFilters()"
-                    mat-button
-                    color="primary"
-                    class="mt-4"
-                    *ngIf="searchText || statusFilter"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- MOBILE VIEW -->
-        <div class="md:hidden bg-gray-50/50 p-4 space-y-4">
-          <div
-            *ngFor="let app of dataSource.filteredData"
-            class="card-modern p-4 flex flex-col gap-4 relative bg-white rounded-lg shadow-sm border border-gray-100"
-            [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-200 border-red-300' : ''"
-            [routerLink]="['/applications', app.id]"
-          >
-            <!-- Notification Indicator -->
-            <div *ngIf="hasNotification(app.id)" class="absolute top-3 right-3 z-10">
-              <span class="flex h-3 w-3">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-                ></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-              </span>
-            </div>
-
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="font-bold text-gray-900 leading-tight">
-                  {{ app.job.title }}
-                </h3>
-                <span class="text-xs text-gray-500">ID: #{{ app.job.id }}</span>
               </div>
-            </div>
-
-            <div class="flex items-center gap-3 pt-3 mt-2 border-t border-gray-100">
-              <app-organization-logo
-                [org]="app.job.organization"
-                size="xs"
-                [rounded]="true"
-              ></app-organization-logo>
-              <div class="flex flex-col">
-                <span class="text-sm font-semibold text-gray-900 leading-tight">{{
-                  app.job.organization?.name || 'Unknown'
-                }}</span>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between mt-2">
-              <div class="flex flex-col">
-                <span class="text-xs text-gray-500">Applicant</span>
-                <span class="text-sm font-medium text-gray-900"
-                  >{{ app.candidate?.firstName }} {{ app.candidate?.lastName }}</span
-                >
-              </div>
-              <div class="flex flex-col items-end">
-                <span class="text-xs text-gray-500">Applied On</span>
-                <span class="text-sm font-medium text-gray-900">{{
-                  app.createdAt | date: 'mediumDate'
-                }}</span>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-              <span
-                [class]="
-                  getStatusClass(app.status) +
-                  ' px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border w-fit block'
-                "
-              >
-                {{ formatStatus(app.status) }}
-              </span>
-              <span class="text-indigo-600 text-sm font-medium flex items-center">
-                View Details <i class="bi bi-chevron-right ml-1"></i>
-              </span>
             </div>
           </div>
 
-          <!-- Empty State Mobile -->
+          <!-- Empty State (No results) -->
           <div
-            *ngIf="dataSource.filteredData.length === 0"
-            class="flex flex-col items-center justify-center py-12 text-center"
+            *ngIf="!loading() && dataSource.filteredData.length === 0"
+            class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200"
           >
-            <div
-              class="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4"
-            >
-              <mat-icon class="text-2xl">search_off</mat-icon>
+            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+              <mat-icon class="text-gray-300">search_off</mat-icon>
             </div>
             <h3 class="text-lg font-bold text-gray-900">No applications found</h3>
+            <p class="text-sm text-gray-500 mt-1 max-w-[240px] text-center">
+              Try adjusting your search or filters to see more applications.
+            </p>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="loading()" class="flex flex-col items-center justify-center py-24">
+            <mat-spinner diameter="40" strokeWidth="3"></mat-spinner>
+            <p class="text-sm font-medium text-gray-400 mt-4 animate-pulse">
+              Loading applications...
+            </p>
           </div>
         </div>
 
@@ -373,7 +247,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
 
   // View Children
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   // State
   dataSource = new MatTableDataSource<JobApplication>([]);
@@ -384,7 +257,7 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   searchText = '';
   statusFilter: ApplicationStatus | '' = '';
 
-  displayedColumns = ['jobTitle', 'applicant', 'company', 'createdAt', 'status', 'actions'];
+  displayedColumns = [];
 
   statuses: ApplicationStatus[] = [
     'APPLIED',
@@ -423,8 +296,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.setupSorting();
   }
 
   loadApplications() {
@@ -472,20 +343,7 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
     };
   }
 
-  setupSorting() {
-    this.dataSource.sortingDataAccessor = (item, property) => {
-      switch (property) {
-        case 'jobTitle':
-          return item.job.title;
-        case 'company':
-          return item.job.organization?.name || '';
-        case 'applicant':
-          return item.candidate?.firstName + ' ' + item.candidate?.lastName;
-        default:
-          return (item as any)[property];
-      }
-    };
-  }
+  // setupSorting() was removed as it's no longer needed for the card view.
 
   applyFilter() {
     const filterValue = JSON.stringify({

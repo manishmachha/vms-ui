@@ -6,14 +6,17 @@
     border: 1px solid #e2e8f0;
     border-radius: 20px;
     margin-bottom: 2rem;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+    overflow: visible; /* Allow dropdowns to be visible */
+}
+
+.stat-card-container {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
 }
 
 .stat-card {
-    flex: 1;
-    min-width: 180px;
+    width: 100%;
     background: #ffffff;
     border-radius: 16px;
     padding: 1.25rem;
@@ -26,6 +29,7 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    z-index: 2;
 }
 
 .stat-card:hover {
@@ -63,6 +67,139 @@
 
 .stat-card:hover .icon-wrapper {
     transform: scale(1.1);
+}
+
+/* Hover Items List */
+.hover-items-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    margin-top: 0.75rem;
+    padding: 1.25rem;
+    z-index: 1000;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.stat-card-container:hover .hover-items-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.list-header {
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.header-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.125em;
+}
+
+.list-content {
+    max-height: 240px;
+    overflow-y: auto;
+    margin-bottom: 0.875rem;
+    padding-right: 4px;
+}
+
+.hover-item {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.375rem;
+    background: #f8fafc;
+    border: 1px solid transparent;
+}
+
+.hover-item:hover {
+    background: #ffffff;
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.item-name {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-arrow {
+    font-size: 1.25rem;
+    color: #6366f1;
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.2s ease;
+}
+
+.hover-item:hover .item-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.list-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    cursor: pointer;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.list-footer:hover {
+    color: #4f46e5;
+}
+
+/* Custom Scrollbar for list */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .stat-info {

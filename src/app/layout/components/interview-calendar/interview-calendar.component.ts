@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCalendarCellClassFunction, MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCalendar, MatCalendarCellClassFunction, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,6 +24,7 @@ import { Interview } from '../../../models/interview.model';
 
       <div class="flex-1 overflow-auto p-4">
         <mat-calendar
+          #calendarRef
           [dateClass]="dateClass"
           [(selected)]="selectedDate"
           (selectedChange)="onDateSelected($event)"
@@ -116,11 +117,11 @@ import { Interview } from '../../../models/interview.model';
       ::ng-deep .has-interview .mat-calendar-body-cell-content::after {
         content: '';
         position: absolute;
-        bottom: 4px;
+        bottom: 2px;
         left: 50%;
         transform: translateX(-50%);
-        width: 3px;
-        height: 3px;
+        width: 4px;
+        height: 4px;
         border-radius: 50%;
         background-color: #ef4444;
       }
@@ -133,6 +134,9 @@ export class InterviewCalendarComponent implements OnInit {
   interviews = signal<Interview[]>([]);
   selectedDate = new Date();
   selectedInterviews = signal<Interview[]>([]);
+  interviewDateSet = new Set<string>();
+
+  @ViewChild('calendarRef') calendarRef!: MatCalendar<Date>;
 
   ngOnInit() {
     this.loadInterviews();
@@ -140,18 +144,30 @@ export class InterviewCalendarComponent implements OnInit {
 
   loadInterviews() {
     this.interviewService.getAllInterviews().subscribe((res) => {
-      this.interviews.set(res || []);
+      const data = res || [];
+      this.interviews.set(data);
+
+      // Build a Set of date strings for O(1) lookup
+      this.interviewDateSet.clear();
+      data.forEach((i) => {
+        this.interviewDateSet.add(this.formatDate(new Date(i.scheduledAt)));
+      });
+
       this.updateSelectedInterviews();
+
+      // Force calendar to re-render cell classes after data loads
+      setTimeout(() => {
+        if (this.calendarRef) {
+          this.calendarRef.updateTodaysDate();
+        }
+      });
     });
   }
 
   dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
     if (view === 'month') {
       const dateStr = this.formatDate(cellDate);
-      const hasInterview = this.interviews().some(
-        (i) => this.formatDate(new Date(i.scheduledAt)) === dateStr,
-      );
-      return hasInterview ? 'has-interview' : '';
+      return this.interviewDateSet.has(dateStr) ? 'has-interview' : '';
     }
     return '';
   };

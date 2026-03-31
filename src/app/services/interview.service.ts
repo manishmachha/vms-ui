@@ -20,6 +20,14 @@ export class InterviewService {
     return this.api.get<Interview[]>('/interviews');
   }
 
+  getVendorInterviews() {
+    return this.api.get<Interview[]>('/interviews/vendor');
+  }
+
+  getInterviewById(id: number) {
+    return this.api.get<Interview>(`/interviews/${id}`);
+  }
+
   submitFeedback(interviewId: number, feedbackData: { feedback: string, rating: number, passed: boolean }) {
     return this.api.post<Interview>(`/interviews/${interviewId}/feedback`, feedbackData);
   }

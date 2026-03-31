@@ -21,6 +21,13 @@ export class HubDashboardBannerComponent {
     }
   }
 
+  navigateToItem(id: number, baseRoute: string, event: Event) {
+    event.stopPropagation(); // Prevent parent card click
+    if (baseRoute && id) {
+      this.router.navigate([baseRoute, id]);
+    }
+  }
+
   getAccentClass(label: string): string {
     const l = label.toLowerCase();
     if (l.includes('candidate')) return 'accent-indigo';

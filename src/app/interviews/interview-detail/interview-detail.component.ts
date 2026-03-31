@@ -39,16 +39,33 @@ import { MatIconModule } from '@angular/material/icon';
                   {{ interview()?.status }}
                 </span>
               </div>
-              <p class="text-lg font-bold text-gray-400 mb-4">{{ interview()?.application?.job?.title }}</p>
+              <p class="text-lg font-bold text-gray-400 mb-1">{{ interview()?.application?.job?.title }}</p>
+              
+              <!-- Job Detail Sub-header -->
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6 text-sm">
+
+                <div class="flex items-center gap-1.5 text-gray-500" *ngIf="interview()?.application?.job?.location">
+                  <i class="bi bi-geo-alt text-gray-400"></i>
+                  <span class="font-medium">{{ interview()?.application?.job?.location }}</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-gray-500">
+                  <i class="bi bi-briefcase text-gray-400"></i>
+                  <span class="font-medium">{{ interview()?.application?.job?.employmentType }}</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-gray-500" *ngIf="interview()?.application?.job?.experience">
+                  <i class="bi bi-clock-history text-gray-400"></i>
+                  <span class="font-medium">{{ interview()?.application?.job?.experience }} Exp.</span>
+                </div>
+              </div>
               
               <div class="flex flex-wrap gap-4">
-                <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50/50 rounded-xl border border-indigo-100/50 shadow-sm transition-all hover:shadow-md">
                   <i class="bi bi-patch-check-fill text-indigo-500"></i>
-                  <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">{{ interview()?.type?.replace('_', ' ') }}</span>
+                  <span class="text-xs font-bold text-indigo-700 uppercase tracking-wide">{{ interview()?.type?.replace('_', ' ') }}</span>
                 </div>
-                <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                  <i class="bi bi-calendar-check text-indigo-500"></i>
-                  <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">{{ interview()?.scheduledAt | date:'medium' }}</span>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50/50 rounded-xl border border-emerald-100/50 shadow-sm transition-all hover:shadow-md">
+                  <i class="bi bi-calendar-check text-emerald-500"></i>
+                  <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide">{{ interview()?.scheduledAt | date:'medium' }}</span>
                 </div>
               </div>
             </div>
@@ -91,7 +108,7 @@ import { MatIconModule } from '@angular/material/icon';
                 </div>
                 <div>
                   <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tight">Email Address</p>
-                  <p class="text-sm font-medium text-gray-900">candidate&#64;example.com</p>
+                  <p class="text-sm font-medium text-gray-900">{{ interview()?.application?.candidate?.email }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
@@ -100,11 +117,11 @@ import { MatIconModule } from '@angular/material/icon';
                 </div>
                 <div>
                   <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tight">Phone Number</p>
-                  <p class="text-sm font-medium text-gray-900">+1 234 567 890</p>
+                  <p class="text-sm font-medium text-gray-900">{{ interview()?.application?.candidate?.phone }}</p>
                 </div>
               </div>
             </div>
-            <button class="w-full mt-6 py-2.5 rounded-2xl bg-gray-50 text-indigo-600 text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-transparent">
+            <button routerLink="/candidates/{{interview()?.application?.candidate?.id}}" class="w-full mt-6 py-2.5 rounded-2xl bg-gray-50 text-indigo-600 text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-transparent">
               View Profile
             </button>
           </div>
@@ -222,10 +239,11 @@ export class InterviewDetailComponent implements OnInit {
   }
 
   loadInterview(id: number) {
-    // Assuming backend endpoint exists for single interview or I filter from list
-    this.interviewService.getAllInterviews().subscribe(res => {
-      const target = res.find(i => i.id == id);
-      this.interview.set(target || null);
+    this.interviewService.getInterviewById(id).subscribe({
+      next: (res) => {
+        this.interview.set(res || null);
+      },
+      error: () => this.interview.set(null)
     });
   }
 
