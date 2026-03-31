@@ -18,83 +18,8 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
   selector: 'app-add-project-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ModalComponent],
-  template: `
-    <app-modal
-      [isOpen]="isOpen"
-      [title]="editProject ? 'Edit Project' : 'New Project'"
-      (isOpenChange)="onClose()"
-    >
-      <form [formGroup]="projectForm" (ngSubmit)="saveProject()" class="space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Project Name</label>
-          <input formControlName="name" class="input-modern" placeholder="Project Alpha" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-          <textarea
-            formControlName="description"
-            rows="3"
-            class="input-modern resize-none"
-            placeholder="Brief project description..."
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Client (Optional)</label>
-          <select formControlName="clientId" class="input-modern bg-white">
-            <option value="">-- Internal Project --</option>
-            <option *ngFor="let client of clients" [value]="client.id">
-              {{ client.name }}
-            </option>
-          </select>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Start Date</label>
-            <input type="date" formControlName="startDate" class="input-modern" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">End Date</label>
-            <input type="date" formControlName="endDate" class="input-modern" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Request ID</label>
-            <input type="text" formControlName="requestId" class="input-modern" placeholder="REQ-001" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Bill Rate</label>
-            <input type="number" formControlName="billRate" class="input-modern" placeholder="0.00" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pay Rate</label>
-            <input type="number" formControlName="payRate" class="input-modern" placeholder="0.00" />
-          </div>
-        </div>
-
-        <div class="pt-4 flex gap-3">
-          <button
-            type="button"
-            (click)="onClose()"
-            class="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            [disabled]="projectForm.invalid"
-            class="flex-1 btn-primary py-3 px-4 rounded-xl font-medium disabled:opacity-50 flex justify-center items-center gap-2"
-          >
-            <span>{{ editProject ? 'Update Project' : 'Create Project' }}</span>
-          </button>
-        </div>
-      </form>
-    </app-modal>
-  `,
+  templateUrl: './add-project-modal.component.html',
+  styleUrls: ['./add-project-modal.component.css'],
 })
 export class AddProjectModalComponent implements OnChanges {
   @Input() isOpen = false;

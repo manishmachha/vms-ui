@@ -1,0 +1,96 @@
+<div class="resume-detail-container">
+  @if (resume()) {
+  <div class="detail-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="info-card">
+        <div class="card-header-brand">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+          <span>Branded Resume</span>
+          <span class="version-badge">v{{ resume()!.version }}</span>
+        </div>
+        <div class="info-content">
+          <div class="status-row">
+            <span class="status-badge" [class]="'status-' + resume()!.status.toLowerCase()">
+              {{ resume()!.status }}
+            </span>
+          </div>
+
+          <h3 class="candidate-name">
+            {{ resume()!.candidate?.firstName }} {{ resume()!.candidate?.lastName }}
+          </h3>
+          <p class="meta"><i class="bi bi-envelope"></i> {{ resume()!.candidate?.email }}</p>
+          @if (resume()!.candidate?.phone) {
+          <p class="meta"><i class="bi bi-telephone"></i> {{ resume()!.candidate?.phone }}</p>
+          } @if (resume()!.candidate?.currentDesignation) {
+          <p class="meta">
+            <i class="bi bi-briefcase"></i> {{ resume()!.candidate?.currentDesignation }}
+          </p>
+          }
+          <p class="meta"><i class="bi bi-building"></i> {{ resume()!.organization?.name }}</p>
+          <p class="meta"><i class="bi bi-calendar3"></i> {{ resume()!.createdAt | date: 'medium' }}</p>
+          @if (resume()!.fileSizeBytes) {
+          <p class="meta"><i class="bi bi-file-earmark"></i> {{ formatFileSize(resume()!.fileSizeBytes) }}</p>
+          } @if (resume()!.generationNotes) {
+          <div class="notes">
+            <small><strong>Notes:</strong> {{ resume()!.generationNotes }}</small>
+          </div>
+          }
+        </div>
+
+        <div class="action-buttons">
+          @if (resume()!.status === 'COMPLETED') {
+          <button class="btn-primary-brand" (click)="downloadResume()">
+            <i class="bi bi-download"></i> Download PDF
+          </button>
+          }
+          <button class="btn-secondary-brand" (click)="regenerate()">
+            <i class="bi bi-arrow-clockwise"></i> Regenerate
+          </button>
+          <a class="btn-outline" [routerLink]="['/candidates', resume()!.candidate?.id]">
+            <i class="bi bi-person"></i> View Candidate
+          </a>
+        </div>
+      </div>
+
+      <!-- Version History -->
+      @if (versions().length > 1) {
+      <div class="versions-card">
+        <h4>Version History</h4>
+        @for (v of versions(); track v.id) {
+        <div class="version-row" [class.active]="v.id === resume()!.id" (click)="loadResume(v.id)">
+          <span class="v-badge">v{{ v.version }}</span>
+          <span class="v-date">{{ v.createdAt | date: 'mediumDate' }}</span>
+          <span class="v-status" [class]="'status-' + v.status.toLowerCase()">
+            {{ v.status }}
+          </span>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- PDF Preview -->
+    <div class="preview-area">
+      @if (resume()!.status === 'COMPLETED' && pdfUrl()) {
+      <iframe [src]="pdfUrl()!" class="pdf-iframe" title="Resume Preview"></iframe>
+      } @if (resume()!.status === 'GENERATING') {
+      <div class="preview-placeholder">
+        <div class="spinner"></div>
+        <h3>Generating Resume...</h3>
+        <p>The AI is revamping and generating a branded PDF. This usually takes 15-30 seconds.</p>
+      </div>
+      } @if (resume()!.status === 'FAILED') {
+      <div class="preview-placeholder failed">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h3>Generation Failed</h3>
+        <p>{{ resume()!.generationNotes || 'An error occurred during generation.' }}</p>
+        <button class="btn-primary-brand" (click)="regenerate()">
+          <i class="bi bi-arrow-clockwise"></i> Retry
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>

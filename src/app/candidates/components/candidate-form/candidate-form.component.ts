@@ -10,6 +10,7 @@ import { Candidate } from '../../models/candidate.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './candidate-form.component.html',
+  styleUrls: ['./candidate-form.component.css'],
 })
 export class CandidateFormComponent {
   private fb = inject(FormBuilder);

@@ -1,0 +1,107 @@
+<div class=" mx-auto space-y-8 p-6">
+  <ng-container *ngIf="vendor() as organization">
+    <!-- Dashboard Banner -->
+    <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
+
+    <!-- Header Card -->
+    <div
+      class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden"
+    >
+      <!-- Abstract Background for aesthetic pop -->
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-linear-to-br from-indigo-50 to-purple-50 rounded-full blur-3xl opacity-60 -mr-20 -mt-20 pointer-events-none"
+      ></div>
+
+      <div class="relative shrink-0 z-10">
+        <app-organization-logo
+          [org]="organization"
+          size="2xl"
+          [rounded]="true"
+        ></app-organization-logo>
+      </div>
+
+      <!-- Info -->
+      <div class="flex-1 min-w-0 z-10">
+        <div class="flex items-center gap-3 mb-2 flex-wrap">
+          <h1 class="text-3xl font-bold text-gray-900 truncate">{{ organization.name }}</h1>
+          <span class="badge badge-primary">{{ organization.orgType }}</span>
+          <span class="badge" [ngClass]="organization.status === 'ACTIVE' ? 'badge-success' : 'badge-danger'">
+            {{ organization.status }}
+          </span>
+        </div>
+
+        <!-- Key Details Grid in Header -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm mb-2">
+          <!-- Location & Web -->
+          <div class="space-y-2">
+            <div
+              *ngIf="organization.address"
+              class="flex items-center gap-2 text-gray-700"
+            >
+              <div
+                class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 shrink-0"
+              >
+                <mat-icon class="text-lg">location_on</mat-icon>
+              </div>
+              <span>
+                {{ organization.address }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="space-y-2">
+            <div *ngIf="organization.email" class="flex items-center gap-2 text-gray-700">
+              <div
+                class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0"
+              >
+                <mat-icon class="text-lg">email</mat-icon>
+              </div>
+              <span class="truncate">{{ organization.email }}</span>
+            </div>
+            <div *ngIf="organization.phone" class="flex items-center gap-2 text-gray-700">
+              <div
+                class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0"
+              >
+                <mat-icon class="text-lg">phone</mat-icon>
+              </div>
+              <span>{{ organization.phone }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Column -->
+      <div class="flex flex-col gap-2 mt-4 md:mt-0 ml-auto min-w-[200px] z-10" *ngIf="canUpdateStatus()">
+        <button
+          *ngIf="organization.status === 'ACTIVE'"
+          (click)="updateStatus('INACTIVE')"
+          class="w-full py-2.5 px-4 bg-amber-50 text-amber-600 font-medium rounded-xl hover:bg-amber-100 transition-colors flex items-center justify-center gap-2"
+        >
+          <i class="bi bi-pause-circle"></i> Deactivate Vendor
+        </button>
+        <button
+          *ngIf="organization.status === 'INACTIVE'"
+          (click)="updateStatus('ACTIVE')"
+          class="w-full py-2.5 px-4 bg-emerald-50 text-emerald-600 font-medium rounded-xl hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+        >
+          <i class="bi bi-play-circle"></i> Activate Vendor
+        </button>
+        
+        <div class="mt-2 text-center">
+          <span class="text-xs text-gray-400">
+            Last updated {{ organization.updatedAt | date:'medium' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Vendor Profile</h2>
+      <div class="prose max-w-none text-gray-600">
+        <p>Official vendor information and active job postings.</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

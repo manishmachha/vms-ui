@@ -5,17 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-organization-logo',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div [class]="containerClass()" [title]="orgName()">
-      <div
-        class="h-full w-full flex items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-white font-bold tracking-wider select-none shadow-sm"
-        [ngClass]="textSize()"
-      >
-        {{ initials() }}
-      </div>
-    </div>
-  `,
-  styles: [],
+  templateUrl: './organization-logo.component.html',
+  styleUrls: ['./organization-logo.component.css'],
 })
 export class OrganizationLogoComponent implements OnChanges {
   @Input() org?: { name?: string } | null;

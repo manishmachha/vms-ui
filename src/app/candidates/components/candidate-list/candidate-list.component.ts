@@ -15,6 +15,7 @@ import { OrganizationLogoComponent } from '../../../layout/components/organizati
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, OrganizationLogoComponent],
   templateUrl: './candidate-list.component.html',
+  styleUrls: ['./candidate-list.component.css'],
 })
 export class CandidateListComponent implements OnInit {
   private candidateService = inject(CandidateService);

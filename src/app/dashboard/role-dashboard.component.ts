@@ -1,14 +1,15 @@
 import { Component, inject, OnInit, ViewContainerRef, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ManagerDashboardComponent } from './manager-dashboard/manager-dashboard.component';
-import { VendorDashboardComponent } from './vendor-dashboard/dashboard.component';
+import { VendorDashboardComponent } from './vendor-dashboard/vendor-dashboard.component';
 import { AuthStore } from '../services/auth.store';
 
 @Component({
   selector: 'app-role-dashboard',
   standalone: true,
   imports: [CommonModule],
-  template: ` <ng-container #dashboardContainer></ng-container> `,
+  templateUrl: './role-dashboard.component.html',
+  styleUrls: ['./role-dashboard.component.css'],
 })
 export class RoleDashboardComponent implements OnInit {
   authStore = inject(AuthStore);

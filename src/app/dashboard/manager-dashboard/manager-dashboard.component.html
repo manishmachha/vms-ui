@@ -1,0 +1,268 @@
+<div class="space-y-6 animate-fade-in pb-10">
+  <!-- Welcome Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Operations Pulse</h2>
+      <p class="text-gray-500">Real-time overview of workforce and recruitment</p>
+    </div>
+    <div
+      class="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-100 shadow-sm"
+    >
+      <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      <span class="text-sm font-medium text-gray-600">Live System Status</span>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 md:gap-4">
+    <a
+      *ngFor="let stat of stats()"
+      [routerLink]="stat.link"
+      class="p-4 rounded-2xl group hover:-translate-y-1 transition-all duration-300 cursor-pointer text-white shadow-lg relative overflow-hidden"
+      [style.background]="stat.bgStyle"
+    >
+      <div class="relative z-10">
+        <div class="flex items-center justify-between mb-3">
+          <div
+            class="p-2 rounded-lg bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform"
+          >
+            <i [class]="stat.icon + ' text-lg text-white'"></i>
+          </div>
+          <span
+            *ngIf="stat.trend"
+            class="text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded backdrop-blur-sm"
+          >
+            {{ stat.trend }}
+          </span>
+        </div>
+        <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">
+          {{ stat.label }}
+        </p>
+      </div>
+      <div
+        class="absolute -right-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"
+      ></div>
+    </a>
+  </div>
+
+  <!-- Main Insights Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Recruitment Funnel -->
+    <div
+      class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col min-h-[300px]"
+    >
+      <div class="flex items-center justify-between mb-8">
+        <h3 class="font-bold text-gray-900 flex items-center gap-2">
+          <div class="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+            <i class="bi bi-funnel"></i>
+          </div>
+          Recruitment Funnel
+        </h3>
+        <span
+          class="text-xs font-medium text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full uppercase tracking-wider"
+          >Active Pipeline</span
+        >
+      </div>
+
+      <div class="flex-1 flex items-center justify-between gap-2 px-4">
+        <div *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
+          <div
+            class="text-center p-4 rounded-2xl transition-all duration-300 hover:shadow-lg border border-transparent hover:border-white"
+            [style.background]="stage.bgColor"
+          >
+            <p
+              class="text-3xl font-black mb-1 group-hover:scale-110 transition-transform"
+              [style.color]="stage.color"
+            >
+              {{ stage.count }}
+            </p>
+            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">
+              {{ stage.name }}
+            </p>
+          </div>
+          <div
+            *ngIf="i < funnelStages().length - 1"
+            class="absolute top-1/2 -right-1 transform -translate-y-1/2 z-10 hidden md:block"
+          >
+            <div class="w-2 h-2 rounded-full bg-gray-200 border-2 border-white"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Sources -->
+    <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <h3 class="font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+          <i class="bi bi-pie-chart"></i>
+        </div>
+        Source Analytics
+      </h3>
+      <div class="h-48 relative">
+        <canvas
+          baseChart
+          [data]="sourceChartData"
+          [type]="'doughnut'"
+          [options]="doughnutChartOptions"
+          class="w-full h-full"
+        >
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Insights Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Applications by Job -->
+    <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-gray-900 flex items-center gap-2">
+          <div class="p-2 rounded-lg bg-blue-50 text-blue-600">
+            <i class="bi bi-bar-chart-steps"></i>
+          </div>
+          Applications by Job
+        </h3>
+      </div>
+      <div class="h-[280px]">
+        <canvas
+          baseChart
+          [data]="jobsChartData"
+          [type]="'bar'"
+          [options]="barChartOptions"
+          class="w-full h-full"
+        >
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div
+      class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col"
+    >
+      <h3 class="font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="p-2 rounded-lg bg-amber-50 text-amber-600">
+          <i class="bi bi-activity"></i>
+        </div>
+        Recent Activity
+      </h3>
+      <div class="flex-1 space-y-5 overflow-y-auto max-h-[280px] custom-scrollbar pr-2">
+        <div
+          *ngFor="let activity of recentActivities()"
+          class="flex gap-4 group cursor-default"
+        >
+          <div class="shrink-0">
+            <div
+              [class]="
+                'w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:rotate-12 ' +
+                activity.iconBg
+              "
+            >
+              <i [class]="activity.icon"></i>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="text-sm font-bold text-gray-900 truncate">{{ activity.title }}</h4>
+              <span class="text-[10px] font-medium text-gray-400">{{ activity.time }}</span>
+            </div>
+            <p class="text-xs text-gray-500 line-clamp-1">{{ activity.description }}</p>
+          </div>
+        </div>
+        <div
+          *ngIf="recentActivities().length === 0"
+          class="flex flex-col items-center justify-center h-full py-10 opacity-40"
+        >
+          <i class="bi bi-inbox text-4xl mb-2"></i>
+          <p class="text-sm">No recent activities</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Interview Calendar -->
+    <div class="lg:col-span-8">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 h-full">
+        <h3 class="font-bold text-slate-800 text-lg mb-4">Interview Calendar</h3>
+        <app-interview-calendar></app-interview-calendar>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="lg:col-span-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 h-full">
+        <h3 class="font-bold text-slate-800 text-lg mb-4">Quick Actions</h3>
+
+        <div class="grid grid-cols-1 gap-4">
+          <a
+            routerLink="/jobs/create"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-indigo-600 bg-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-briefcase"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-indigo-600">
+                Post New Job
+              </h4>
+              <p class="text-xs text-gray-500">Create a new job listing</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/users/"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-purple-600 bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-person-plus"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-purple-600">
+                Manage Users
+              </h4>
+              <p class="text-xs text-gray-500">Admin accounts & roles</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/vendors"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-teal-600 bg-teal-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-shop"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-teal-600">
+                View Vendors
+              </h4>
+              <p class="text-xs text-gray-500">Manage vendor organizations</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/applications"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-emerald-600 bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-file-earmark-check"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-emerald-600">
+                Review Applications
+              </h4>
+              <p class="text-xs text-gray-500">Review pending applications</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

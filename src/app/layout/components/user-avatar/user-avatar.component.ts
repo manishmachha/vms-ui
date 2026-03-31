@@ -5,27 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-user-avatar',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div
-      class="w-full h-full flex items-center justify-center overflow-hidden bg-gray-200 relative"
-    >
-      <img
-        [src]="avatarUrl()"
-        class="w-full h-full object-cover"
-        alt="User"
-        (error)="onImageError()"
-      />
-    </div>
-  `,
-  styles: [
-    `
-      :host {
-        display: block;
-        border-radius: 9999px;
-        overflow: hidden;
-      }
-    `,
-  ],
+  templateUrl: './user-avatar.component.html',
+  styleUrls: ['./user-avatar.component.css'],
 })
 export class UserAvatarComponent implements OnChanges {
   @Input() user: {

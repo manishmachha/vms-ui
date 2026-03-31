@@ -1,0 +1,24 @@
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 20px;
+}
+.nav-item.active-link {
+  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+  color: #4f46e5;
+}
+.nav-item.active-link .nav-icon {
+  background: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+.nav-item.active-link .nav-icon i {
+  color: #6366f1;
+}
+.nav-item.active-link .active-dot {
+  opacity: 1;
+}

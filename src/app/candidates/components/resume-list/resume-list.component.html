@@ -1,0 +1,101 @@
+<div class="resume-list-container">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Search by name, email, org..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </div>
+    <div class="filters">
+      <select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilter($event)">
+        <option value="ALL">All Status</option>
+        <option value="COMPLETED">Completed</option>
+        <option value="GENERATING">Generating</option>
+        <option value="FAILED">Failed</option>
+      </select>
+      <select [ngModel]="sortField()" (ngModelChange)="onSort($event)">
+        <option value="createdAt">Newest First</option>
+        <option value="name">Name A-Z</option>
+        <option value="version">Version (High-Low)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Empty  -->
+  @if (filteredResumes().length === 0) {
+  <div class="empty-state">
+    <i class="bi bi-file-earmark-pdf"></i>
+    <h3>No Branded Resumes</h3>
+    <p>Branded resumes are automatically generated when candidates are created or updated.</p>
+  </div>
+  }
+
+  <!-- Resume Grid -->
+  @if (filteredResumes().length > 0) {
+  <div class="resume-grid">
+    @for (resume of filteredResumes(); track resume.id) {
+    <div
+      class="resume-card"
+      [class.generating]="resume.status === 'GENERATING'"
+      [class.failed]="resume.status === 'FAILED'"
+    >
+      <div class="card-header">
+        <div class="pdf-icon">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+        </div>
+        <span class="version-badge">v{{ resume.version }}</span>
+        <span class="status-badge" [class]="'status-' + resume.status.toLowerCase()">
+          {{ resume.status }}
+        </span>
+      </div>
+      <div class="card-body">
+        <h4 class="candidate-name">
+          {{ resume.candidate?.firstName }} {{ resume.candidate?.lastName }}
+        </h4>
+        <p class="candidate-email">{{ resume.candidate?.email }}</p>
+        @if (resume.candidate?.currentDesignation) {
+        <p class="designation">{{ resume.candidate?.currentDesignation }}</p>
+        }
+        <div class="meta-row">
+          <span><i class="bi bi-building"></i> {{ resume.organization?.name }}</span>
+          <span><i class="bi bi-calendar3"></i> {{ resume.createdAt | date: 'mediumDate' }}</span>
+        </div>
+        @if (resume.fileSizeBytes) {
+        <p class="file-size">{{ formatFileSize(resume.fileSizeBytes) }}</p>
+        }
+      </div>
+      <div class="card-actions">
+        @if (resume.status === 'COMPLETED') {
+        <button class="btn-download" (click)="downloadResume(resume)">
+          <i class="bi bi-download"></i> Download
+        </button>
+        <a class="btn-view" [routerLink]="['/candidates/resumes', resume.id]">
+          <i class="bi bi-eye"></i> View
+        </a>
+        } @if (resume.status === 'FAILED') {
+        <button class="btn-retry" (click)="regenerate(resume)">
+          <i class="bi bi-arrow-clockwise"></i> Retry
+        </button>
+        } @if (resume.status === 'GENERATING') {
+        <span class="generating-text">
+          <div class="mini-spinner"></div>
+          Generating...
+        </span>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Summary -->
+  @if (filteredResumes().length > 0) {
+  <div class="summary-bar">
+    Showing {{ filteredResumes().length }} of {{ resumes().length }} branded resumes
+  </div>
+  }
+</div>

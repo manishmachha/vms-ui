@@ -1,0 +1,40 @@
+.modern-calendar {
+  width: 100% !important;
+}
+::ng-deep .modern-calendar .mat-calendar-header {
+  padding: 0 0 8px 0 !important;
+}
+::ng-deep .modern-calendar .mat-calendar-content {
+  padding: 0 !important;
+}
+::ng-deep .modern-calendar .mat-calendar-table-header th {
+  color: #9ca3af !important;
+  font-weight: 700 !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+}
+::ng-deep .modern-calendar .mat-calendar-body-cell-content {
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+::ng-deep .modern-calendar .mat-calendar-body-selected {
+  background-color: #6366f1 !important;
+  color: white !important;
+}
+::ng-deep .has-interview .mat-calendar-body-cell-content {
+  background-color: #fef2f2 !important;
+  color: #ef4444 !important;
+  font-weight: 700 !important;
+  position: relative;
+}
+::ng-deep .has-interview .mat-calendar-body-cell-content::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
