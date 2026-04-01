@@ -174,7 +174,10 @@ export class ProjectDetailComponent implements OnInit {
   openAllocateModal() {
     this.dialog.open(AllocateResourceModalComponent, {
       width: '500px',
-      data: { projectId: this.project()?.id },
+      data: { 
+        projectId: this.project()?.id,
+        candidates: this.candidates()
+      },
       panelClass: 'dialog-modern'
     }).afterClosed().subscribe(result => {
       if (result) this.loadAllocations(this.project()!.id);

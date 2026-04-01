@@ -10,13 +10,13 @@
     <div>
       <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Select Candidate</label>
       <div class="relative group">
-        <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">person_add</mat-icon>
+        <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">person_add</mat-icon>
         <select
           formControlName="candidateId"
           class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
         >
           <option value="">Choose a candidate...</option>
-          <option *ngFor="let candidate of data.candidates" [value]="candidate.id">
+          <option *ngFor="let candidate of candidates()" [value]="candidate.id">
             {{ candidate.firstName }} {{ candidate.lastName }}
           </option>
         </select>
@@ -26,7 +26,7 @@
     <div>
       <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Billing Role</label>
       <div class="relative group">
-        <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">badge</mat-icon>
+        <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">badge</mat-icon>
         <input
           formControlName="billingRole"
           placeholder="e.g. Senior Frontend Developer"
@@ -39,7 +39,6 @@
       <div>
         <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Start Date</label>
         <div class="relative group">
-          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">calendar_today</mat-icon>
           <input
             type="date"
             formControlName="startDate"
