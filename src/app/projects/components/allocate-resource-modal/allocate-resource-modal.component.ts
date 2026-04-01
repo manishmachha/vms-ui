@@ -10,6 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ProjectService, AllocateUserRequest } from '../../../services/project.service';
 import { DialogService } from '../../../services/dialog.service';
+import { CandidateService } from '../../../services/candidate.service';
+import { Candidate } from '../../../candidates/models/candidate.model';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-allocate-resource-modal',
@@ -30,6 +33,9 @@ export class AllocateResourceModalComponent implements OnInit {
   private dialogService = inject(DialogService);
   public dialogRef = inject(MatDialogRef<AllocateResourceModalComponent>);
   public data = inject(MAT_DIALOG_DATA);
+  private candidateService = inject(CandidateService);
+
+  candidates = signal<Candidate[]>([]);
 
   allocateForm = this.fb.group({
     candidateId: ['', Validators.required],
@@ -40,6 +46,14 @@ export class AllocateResourceModalComponent implements OnInit {
 
   ngOnInit() {
     this.allocateForm.reset({ percentage: 100 });
+    
+    if (this.data.candidates && this.data.candidates.length > 0) {
+      this.candidates.set(this.data.candidates);
+    } else {
+      this.candidateService.getCandidates().subscribe((candidates) => {
+        this.candidates.set(candidates);
+      });
+    }
   }
 
   allocateUser() {
