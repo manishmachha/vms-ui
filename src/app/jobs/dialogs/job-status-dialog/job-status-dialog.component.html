@@ -1,0 +1,59 @@
+<div class="p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-200/50">
+      <mat-icon class="text-white text-xl">sync</mat-icon>
+    </div>
+    <div>
+      <h3 class="text-xl font-bold text-gray-900">Update Job Status</h3>
+      <p class="text-sm text-gray-500">Change the current status of this job</p>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="ml-auto text-gray-400 hover:text-gray-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="updateStatusForm" (ngSubmit)="onUpdateStatus()" class="space-y-6">
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">New Status</label>
+      <select
+        formControlName="status"
+        class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+      >
+        <option value="DRAFT">Draft</option>
+        <option value="SUBMITTED">Submitted</option>
+        <option value="ADMIN_VERIFIED">Admin Verified</option>
+        <option value="TA_ENRICHED">TA Enriched</option>
+        <option value="ADMIN_FINAL_VERIFIED">Admin Final Verified</option>
+        <option value="PUBLISHED">Published</option>
+        <option value="CLOSED">Closed (Archived)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Internal Note (Reason)</label>
+      <textarea
+        formControlName="message"
+        rows="4"
+        placeholder="Reason for status change, next steps..."
+        class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none resize-none"
+      ></textarea>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-50">
+      <button
+        type="button"
+        (click)="dialogRef.close()"
+        class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold transition-all"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        [disabled]="updateStatusForm.invalid"
+        class="px-8 py-2.5 bg-linear-to-r from-indigo-600 to-purple-700 text-white rounded-xl hover:from-indigo-700 hover:to-purple-800 font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+      >
+        Update Status
+      </button>
+    </div>
+  </form>
+</div>

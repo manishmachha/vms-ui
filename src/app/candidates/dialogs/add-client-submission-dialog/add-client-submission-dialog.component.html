@@ -1,0 +1,70 @@
+<div class="p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-200/50">
+      <mat-icon class="text-white text-xl">send</mat-icon>
+    </div>
+    <div>
+      <h3 class="text-xl font-bold text-gray-900">Submit to Client</h3>
+      <p class="text-sm text-gray-500">Submit this candidate for client consideration</p>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="ml-auto text-gray-400 hover:text-gray-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="submissionForm" (ngSubmit)="submitToClient()" class="space-y-6">
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Target Client</label>
+      <select
+        formControlName="clientId"
+        class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+      >
+        <option value="" disabled>Select a client...</option>
+        @for (client of clients(); track client.id) {
+          <option [value]="client.id">{{ client.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">External Job Ref / ID</label>
+      <div class="relative group">
+        <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 font-bold group-focus-within:text-blue-600 transition-colors">tag</mat-icon>
+        <input
+          type="text"
+          formControlName="externalReferenceId"
+          placeholder="Client portal reference number..."
+          class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Submission Remarks</label>
+      <textarea
+        formControlName="remarks"
+        rows="4"
+        placeholder="Key highlights for the client..."
+        class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"
+      ></textarea>
+      <p class="text-[10px] text-gray-400 mt-2 italic px-1">These remarks may be visible to account managers</p>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-50">
+      <button
+        type="button"
+        (click)="dialogRef.close()"
+        class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold transition-all"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        [disabled]="submissionForm.invalid || isSubmitting"
+        class="px-8 py-2.5 bg-linear-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 font-bold transition-all shadow-lg shadow-blue-200 disabled:opacity-50"
+      >
+        {{ isSubmitting ? 'Submitting...' : 'Confirm Submission' }}
+      </button>
+    </div>
+  </form>
+</div>

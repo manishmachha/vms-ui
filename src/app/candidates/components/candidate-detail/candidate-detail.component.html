@@ -59,7 +59,7 @@
             </button>
             <button
               *ngIf="!authStore.isEmployee() && !candidate()?.isArchived"
-              (click)="showArchiveConfirm.set(true)"
+              (click)="openArchiveConfirm()"
               class="px-4 py-2 rounded-lg text-sm font-semibold text-amber-600 bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-2 shadow-sm cursor-pointer"
             >
               <i class="bi bi-archive"></i> Archive
@@ -786,25 +786,4 @@
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
-  <app-confirm-modal
-    [isOpen]="showDeleteConfirm()"
-    title="Delete Candidate"
-    message="Are you sure you want to delete this candidate? This action cannot be undone."
-    type="danger"
-    confirmText="Delete Candidate"
-    (confirm)="onDeleteConfirmed()"
-    (cancel)="showDeleteConfirm.set(false)"
-  ></app-confirm-modal>
-
-  <!-- Archive Confirmation Modal -->
-  <app-confirm-modal
-    [isOpen]="showArchiveConfirm()"
-    title="Archive Candidate"
-    message="Are you sure you want to archive this candidate? They will be marked as inactive but their data will be preserved."
-    type="warning"
-    confirmText="Archive Candidate"
-    (confirm)="onArchiveConfirmed()"
-    (cancel)="showArchiveConfirm.set(false)"
-  ></app-confirm-modal>
 </div>

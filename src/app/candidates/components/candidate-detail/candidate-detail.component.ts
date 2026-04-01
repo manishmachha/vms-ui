@@ -17,8 +17,8 @@ import { HubDashboardBannerComponent } from '../../../shared/components/hub-dash
 import { DashboardStatsResponse } from '../../../models/dashboard-stats.model';
 
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
-import { ConfirmModalComponent } from '../../../layout/components/confirm-modal/confirm-modal.component';
 import { ClientSubmissionsComponent } from '../client-submissions/client-submissions.component';
+import { DialogService } from '../../../services/dialog.service';
 
 @Component({
   selector: 'app-candidate-detail',
@@ -29,7 +29,6 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
     MatDialogModule,
     BaseChartDirective,
     OrganizationLogoComponent,
-    ConfirmModalComponent,
     ClientSubmissionsComponent,
     HubDashboardBannerComponent,
     MatIconModule,
@@ -45,6 +44,7 @@ export class CandidateDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private brandedResumeService = inject(BrandedResumeService);
   public authStore = inject(AuthStore);
+  private dialogService = inject(DialogService);
 
   candidate = signal<Candidate | null>(null);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
@@ -52,8 +52,6 @@ export class CandidateDetailComponent implements OnInit {
   applications = signal<JobApplication[]>([]);
   interviews = signal<Interview[]>([]);
   skillsExpanded = signal(false);
-  showDeleteConfirm = signal(false);
-  showArchiveConfirm = signal(false);
 
 
   ngOnInit() {
@@ -148,33 +146,36 @@ export class CandidateDetailComponent implements OnInit {
     });
   }
 
-  onArchiveConfirmed() {
-    const c = this.candidate();
-    if (!c) return;
-    this.candidateService.archiveCandidate(c.id).subscribe({
-      next: (updated) => {
-        this.candidate.set(updated);
-        this.showArchiveConfirm.set(false);
-        this.snackBar.open('Candidate archived successfully', 'OK', { duration: 3000 });
-      },
-      error: () => this.snackBar.open('Archive failed', 'Close', { duration: 3000 })
-    });
-  }
-
-  onDeleteConfirmed() {
-    const c = this.candidate();
-    if (!c) return;
-    this.candidateService.deleteCandidate(c.id).subscribe({
-      next: () => {
-        this.snackBar.open('Candidate deleted', 'OK', { duration: 3000 });
-        this.router.navigate(['/candidates']);
-      },
-      error: () => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
+  openArchiveConfirm() {
+    this.dialogService.confirm('Archive Candidate', 'Are you sure you want to archive this candidate?', 'primary').subscribe(confirmed => {
+      if (confirmed) {
+        const c = this.candidate();
+        if (!c) return;
+        this.candidateService.archiveCandidate(c.id).subscribe({
+          next: (updated) => {
+            this.candidate.set(updated);
+            this.snackBar.open('Candidate archived successfully', 'OK', { duration: 3000 });
+          },
+          error: () => this.snackBar.open('Archive failed', 'Close', { duration: 3000 })
+        });
+      }
     });
   }
 
   openDeleteConfirm() {
-    this.showDeleteConfirm.set(true);
+    this.dialogService.confirmDelete('Candidate').subscribe(confirmed => {
+      if (confirmed) {
+        const c = this.candidate();
+        if (!c) return;
+        this.candidateService.deleteCandidate(c.id).subscribe({
+          next: () => {
+            this.snackBar.open('Candidate deleted', 'OK', { duration: 3000 });
+            this.router.navigate(['/candidates']);
+          },
+          error: () => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
+        });
+      }
+    });
   }
 
   // Analysis Signal

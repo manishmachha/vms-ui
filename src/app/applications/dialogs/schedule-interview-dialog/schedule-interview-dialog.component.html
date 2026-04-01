@@ -1,0 +1,113 @@
+<div class="dialog-container p-6">
+  <div class="flex items-center justify-between mb-6 p-1">
+    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+      <mat-icon class="text-indigo-600!">event</mat-icon> 
+      Schedule Interview
+    </h3>
+    <button mat-icon-button (click)="dialogRef.close()" class="text-gray-400 hover:text-gray-600 transition-colors">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="scheduleForm" (ngSubmit)="scheduleInterview()" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="col-span-1 md:col-span-2">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Interview Date & Time</label>
+        <div class="relative group">
+          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">calendar_today</mat-icon>
+          <input 
+            type="datetime-local" 
+            formControlName="scheduledAt" 
+            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Interview Type</label>
+        <select 
+          formControlName="type" 
+          class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+        >
+          <option value="SCREENING">Screening</option>
+          <option value="TECHNICAL">Technical Round</option>
+          <option value="HR">HR Round</option>
+          <option value="CLIENT_ROUND">Client Round</option>
+          <option value="FINAL">Final Interview</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Duration (Minutes)</label>
+        <input 
+          type="number" 
+          formControlName="durationMinutes" 
+          class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+        >
+      </div>
+
+      <div class="col-span-1 md:col-span-2">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Meeting Link (Optional)</label>
+        <div class="relative group">
+          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">videocam</mat-icon>
+          <input 
+            type="text" 
+            formControlName="meetingLink" 
+            placeholder="Zoom, Google Meet, Teams link..." 
+            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+          >
+        </div>
+      </div>
+
+      <div class="col-span-1 md:col-span-2">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">CC Users (Notification)</label>
+        
+        <!-- User Search -->
+        <div class="relative group mb-3">
+          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
+          <input 
+            type="text" 
+            [ngModel]="userSearchTerm()" 
+            (ngModelChange)="userSearchTerm.set($event)"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Search by name, email or organization..." 
+            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 h-10!"
+          >
+        </div>
+
+        <select 
+          multiple 
+          formControlName="ccUserIds" 
+          class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[140px]"
+        >
+          @for (user of filteredCcUsers(); track user.id) {
+            <option [value]="user.id">
+              {{ user.firstName }} {{ user.lastName }} 
+              ({{ user.organizationName || 'No Organization' }})
+            </option>
+          }
+        </select>
+        <p class="text-[10px] text-gray-400 mt-2 px-1 font-medium italic">
+          Tip: Hold Ctrl/Cmd to select multiple recipients
+        </p>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-50">
+      <button
+        type="button"
+        (click)="dialogRef.close()"
+        class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold transition-all"
+      >
+        Discard
+      </button>
+      <button
+        type="submit"
+        [disabled]="scheduleForm.invalid"
+        class="px-8 py-2.5 bg-linear-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
+      >
+        Schedule Interview
+      </button>
+    </div>
+  </form>
+</div>

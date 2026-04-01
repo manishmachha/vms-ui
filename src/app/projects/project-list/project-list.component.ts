@@ -11,7 +11,9 @@ import { FormsModule } from '@angular/forms';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { NotificationService } from '../../services/notification.service';
-import { AddProjectModalComponent } from '../components/add-project-modal/add-project-modal.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogService } from '../../services/dialog.service';
+import { AddProjectDialogComponent } from '../components/add-project-modal/add-project-dialog.component';
 @Component({
   selector: 'app-project-list',
   standalone: true,
@@ -21,7 +23,6 @@ import { AddProjectModalComponent } from '../components/add-project-modal/add-pr
     FormsModule,
     OrganizationLogoComponent,
     UserAvatarComponent,
-    AddProjectModalComponent,
   ],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
@@ -32,16 +33,12 @@ export class ProjectListComponent implements OnInit {
   orgService = inject(OrganizationService);
   headerService = inject(HeaderService);
   private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
 
   projects = signal<Project[]>([]);
   clients = signal<Client[]>([]);
   unreadProjectIds = new Set<number>();
-
-  showCreateModal = false;
-  projectToEdit: Project | null = null;
-  showDeleteConfirm = false;
-  projectToDelete: Project | null = null;
-  deleting = false;
   activeMenuId: number | null = null;
 
   searchQuery = '';
@@ -124,20 +121,28 @@ export class ProjectListComponent implements OnInit {
   }
 
   openCreateModal() {
-    this.projectToEdit = null;
-    this.showCreateModal = true;
     this.activeMenuId = null;
+    this.dialog.open(AddProjectDialogComponent, {
+      width: '600px',
+      data: { clients: this.clients() },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadProjects();
+    });
   }
 
   openEditModal(project: Project) {
-    this.projectToEdit = project;
-    this.showCreateModal = true;
     this.activeMenuId = null;
-  }
-
-  closeModal() {
-    this.showCreateModal = false;
-    this.projectToEdit = null;
+    this.dialog.open(AddProjectDialogComponent, {
+      width: '600px',
+      data: { 
+        clients: this.clients(),
+        editProject: project 
+      },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadProjects();
+    });
   }
 
   changeStatus(project: Project, status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD' | 'PLANNED') {
@@ -151,26 +156,18 @@ export class ProjectListComponent implements OnInit {
   }
 
   confirmDelete(project: Project) {
-    this.projectToDelete = project;
-    this.showDeleteConfirm = true;
     this.activeMenuId = null;
-  }
-
-  deleteProject() {
-    if (!this.projectToDelete) return;
-    this.deleting = true;
-
-    this.projectService.deleteProject(this.projectToDelete.id).subscribe({
-      next: () => {
-        this.loadProjects();
-        this.showDeleteConfirm = false;
-        this.projectToDelete = null;
-        this.deleting = false;
-      },
-      error: (err) => {
-        console.error('Failed to delete project', err);
-        this.deleting = false;
-      },
+    this.dialogService.confirmDelete('Project').subscribe(confirmed => {
+      if (confirmed) {
+        this.projectService.deleteProject(project.id).subscribe({
+          next: () => {
+            this.loadProjects();
+          },
+          error: (err) => {
+            console.error('Failed to delete project', err);
+          },
+        });
+      }
     });
   }
 

@@ -63,7 +63,7 @@
             <button
               mat-flat-button
               color="accent"
-              (click)="showScheduleModal.set(true)"
+              (click)="scheduleInterview()"
               *ngIf="canManageApplication() && ['SHORTLISTED', 'L1_INTERVIEW', 'L2_INTERVIEW', 'L3_INTERVIEW'].includes(app.status)"
               class="h-[46px]! rounded-xl! px-6! flex-1 sm:flex-none shadow-sm!"
             >
@@ -662,7 +662,7 @@
                 <div class="p-6 bg-gray-50/30 h-full">
                   <div class="flex justify-between items-center mb-6" *ngIf="canManageApplication()">
                     <h3 class="text-lg font-bold text-gray-900">Scheduled Sessions</h3>
-                    <button mat-button color="primary" (click)="showScheduleModal.set(true)">
+                    <button mat-button color="primary" (click)="scheduleInterview()">
                       <mat-icon class="mr-1">add</mat-icon> Schedule New
                     </button>
                   </div>
@@ -934,95 +934,4 @@
   </div>
 
   <!-- Schedule Modal -->
-  @if (showScheduleModal()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-white/20 animate-in fade-in zoom-in duration-300">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <mat-icon class="text-indigo-600!">event</mat-icon> Schedule Interview
-          </h3>
-          <button mat-icon-button (click)="showScheduleModal.set(false)" class="text-gray-400 hover:text-gray-600">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-
-        <form [formGroup]="scheduleForm" (ngSubmit)="scheduleInterview()" class="p-8 space-y-6">
-          <div class="grid grid-cols-2 gap-6">
-            <div class="col-span-2">
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Interview Date & Time</label>
-              <div class="relative group">
-                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">calendar_today</mat-icon>
-                <input type="datetime-local" formControlName="scheduledAt" class="input-modern pl-12 bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Type</label>
-              <select formControlName="type" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10">
-                <option value="SCREENING">Screening</option>
-                <option value="TECHNICAL">Technical</option>
-                <option value="HR">HR Round</option>
-                <option value="CLIENT_ROUND">Client Round</option>
-                <option value="FINAL">Final Round</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Duration (Min)</label>
-              <input type="number" formControlName="durationMinutes" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10">
-            </div>
-
-            <div class="col-span-2">
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Meeting Link (Optional)</label>
-              <div class="relative group">
-                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">videocam</mat-icon>
-                <input type="text" formControlName="meetingLink" placeholder="Zoom, Google Meet, Teams link..." class="input-modern pl-12 bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10">
-              </div>
-            </div>
-
-            <div class="col-span-2">
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">CC Users (Solventek / Vendor)</label>
-              
-              <!-- User Search -->
-              <div class="relative group mb-3">
-                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
-                <input 
-                  type="text" 
-                  [ngModel]="userSearchTerm()" 
-                  (ngModelChange)="userSearchTerm.set($event)"
-                  [ngModelOptions]="{standalone: true}"
-                  placeholder="Search by name, email or organization..." 
-                  class="input-modern pl-12 bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 h-10!"
-                >
-              </div>
-
-              <select multiple formControlName="ccUserIds" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[120px]">
-                @for (user of filteredCcUsers(); track user.id) {
-                  <option [value]="user.id">
-                    {{ user.firstName }} {{ user.lastName }} 
-                    ({{ user.organizationName || 'No Organization' }})
-                  </option>
-                }
-              </select>
-              <p class="text-[10px] text-gray-500 mt-1 px-1">Hold Ctrl/Cmd to select multiple users</p>
-            </div>
-
-            <div class="col-span-2">
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Scheduling Notes</label>
-              <textarea formControlName="schedulingNotes" rows="3" placeholder="Add any specific instructions or notes for this interview..." class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 resize-none"></textarea>
-            </div>
-          </div>
-
-          <div class="pt-4 flex gap-3">
-            <button type="button" mat-stroked-button (click)="showScheduleModal.set(false)" class="flex-1 h-[52px]! rounded-2xl! border-2 font-bold text-gray-500 hover:bg-gray-50 hover:border-gray-200">
-              Cancel
-            </button>
-            <button type="submit" mat-flat-button color="primary" [disabled]="scheduleForm.invalid" class="flex-1 h-[52px]! rounded-2xl! font-bold shadow-indigo-200/50 shadow-lg">
-              Confirm Schedule
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
 }

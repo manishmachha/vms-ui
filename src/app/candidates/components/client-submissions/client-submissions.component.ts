@@ -11,7 +11,9 @@ import { Client } from '../../../models/client.model';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthStore } from '../../../services/auth.store';
-import { ModalComponent } from '../../../layout/components/modal/modal.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogService } from '../../../services/dialog.service';
+import { AddClientSubmissionDialogComponent } from '../../dialogs/add-client-submission-dialog/add-client-submission-dialog.component';
 
 @Component({
   selector: 'app-client-submissions',
@@ -20,7 +22,6 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    ModalComponent,
     MatMenuModule,
     MatIconModule,
   ],
@@ -35,16 +36,14 @@ export class ClientSubmissionsComponent implements OnInit {
   private clientService = inject(ClientService);
   private authStore = inject(AuthStore);
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
 
   submissions = signal<ClientSubmission[]>([]);
   activeSubmissionId = signal<number | null>(null);
   comments = signal<any[]>([]);
   newCommentText = '';
-
   clients = signal<Client[]>([]);
-
-  showAddModal = false;
-  isSubmitting = false;
 
   // Permissions: Vendor cannot edit
   canEditStatus = this.authStore.orgType() !== 'VENDOR';
@@ -65,14 +64,7 @@ export class ClientSubmissionsComponent implements OnInit {
     { label: 'Screening', status: 'CLIENT_SCREENING' },
     { label: 'Interview', status: 'CLIENT_INTERVIEW' },
     { label: 'Offer', status: 'CLIENT_OFFERED' },
-    // Rejection or Withdrawn will just be final states shown differently if active
   ];
-
-  submissionForm = this.fb.group({
-    clientId: ['', Validators.required],
-    externalReferenceId: [''],
-    remarks: [''],
-  });
 
   ngOnInit() {
     if (this.candidateId) {
@@ -137,42 +129,32 @@ export class ClientSubmissionsComponent implements OnInit {
   }
 
   openAddModal() {
-    this.showAddModal = true;
-    this.submissionForm.reset();
-  }
-
-  submitToClient() {
-    if (this.submissionForm.invalid) return;
-
-    this.isSubmitting = true;
-    const val = this.submissionForm.value;
-
-    this.submissionService
-      .createSubmission({
-        candidateId: Number(this.candidateId),
-        clientId: Number(val.clientId!),
-        jobId: this.jobId ? Number(this.jobId) : undefined,
-        externalReferenceId: val.externalReferenceId || undefined,
-        remarks: val.remarks || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.showAddModal = false;
-          this.loadSubmissions();
-        },
-        error: () => {
-          this.isSubmitting = false;
-        },
-      });
+    this.dialog.open(AddClientSubmissionDialogComponent, {
+      width: '500px',
+      data: { 
+        candidateId: this.candidateId, 
+        jobId: this.jobId, 
+        clients: this.clients() 
+      },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadSubmissions();
+    });
   }
 
   updateStatus(sub: ClientSubmission, status: ClientSubmissionStatus) {
     if (sub.status === status) return;
-    if (!confirm(`Change status to ${this.formatStatus(status)}?`)) return;
-
-    this.submissionService.updateStatus(sub.id, { status }).subscribe(() => {
-      this.loadSubmissions();
+    
+    this.dialogService.confirm(
+      'Update Status', 
+      `Are you sure you want to change status to ${this.formatStatus(status)}?`,
+      'primary'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.submissionService.updateStatus(sub.id, { status }).subscribe(() => {
+          this.loadSubmissions();
+        });
+      }
     });
   }
 

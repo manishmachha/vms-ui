@@ -13,6 +13,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { HeaderService } from '../../services/header.service';
 import { JobApplication } from '../../models/application.model';
+import { DialogService } from '../../services/dialog.service';
+import { JobEnrichDialogComponent } from '../dialogs/job-enrich-dialog/job-enrich-dialog.component';
+import { JobVerifyDialogComponent } from '../dialogs/job-verify-dialog/job-verify-dialog.component';
+import { JobStatusDialogComponent } from '../dialogs/job-status-dialog/job-status-dialog.component';
 
 @Component({
   selector: 'app-job-detail',
@@ -37,11 +41,9 @@ export class JobDetailComponent implements OnInit {
   applicationService = inject(ApplicationService);
   dialog = inject(MatDialog);
   headerService = inject(HeaderService);
+  dialogService = inject(DialogService);
 
   job = signal<Job | null>(null);
-  showEnrichForm = false;
-  showFinalVerifyForm = false;
-  showApplyModal = false;
   myCandidates = signal<Candidate[]>([]);
   selectedCandidateId = '';
   applications = signal<JobApplication[]>([]);
@@ -54,18 +56,6 @@ export class JobDetailComponent implements OnInit {
       groups.get(vendorName)!.push(app);
     });
     return Array.from(groups.entries());
-  });
-
-  enrichForm = this.fb.group({
-    requirements: ['', Validators.required],
-    rolesAndResponsibilities: ['', Validators.required],
-    experience: ['', Validators.required],
-    skills: ['', Validators.required],
-  });
-
-  finalVerifyForm = this.fb.group({
-    billRate: [0, Validators.required],
-    payRate: [0, Validators.required],
   });
 
   ngOnInit() {
@@ -186,92 +176,81 @@ export class JobDetailComponent implements OnInit {
 
   // Actions
   verify() {
-    if (confirm('Verify this job?')) {
-      this.jobService.verifyJob(this.job()!.id).subscribe(() => this.loadJob());
-    }
+    const currentJob = this.job();
+    if (!currentJob) return;
+
+    this.dialogService.confirm(
+      'Verify Job',
+      'Are you sure you want to verify this job? It will be move to enrichment stage.',
+      'primary'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.jobService.verifyJob(currentJob.id).subscribe(() => this.loadJob());
+      }
+    });
   }
 
   openEnrichForm() {
-    this.showEnrichForm = true;
     const currentJob = this.job();
-    if (currentJob) {
-      this.enrichForm.patchValue({
-        requirements: currentJob.requirements || '',
-        rolesAndResponsibilities: currentJob.rolesAndResponsibilities || '',
-        experience: currentJob.experience || '',
-        skills: currentJob.skills || '',
-      });
-    }
-  }
+    if (!currentJob) return;
 
-  skipEnrichment() {
-    if (confirm('Are you sure you want to skip enrichment?')) {
-      this.jobService
-        .updateStatus(this.job()!.id, 'TA_ENRICHED', 'Enrichment skipped')
-        .subscribe({
-          next: () => {
-            this.showEnrichForm = false;
-            this.loadJob();
-          },
-          error: (err: any) => {
-            console.error(err);
-          },
-        });
-    }
-  }
-
-  onEnrich() {
-    if (this.enrichForm.valid) {
-      this.jobService.enrichJob(this.job()!.id, this.enrichForm.value as any).subscribe(() => {
-        this.showEnrichForm = false;
-        this.loadJob();
-      });
-    }
+    this.dialog.open(JobEnrichDialogComponent, {
+      width: '800px',
+      data: { job: currentJob },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadJob();
+    });
   }
 
   onFinalVerify() {
-    if (this.finalVerifyForm.valid) {
-      this.jobService
-        .finalVerifyJob(this.job()!.id, this.finalVerifyForm.value as any)
-        .subscribe(() => {
-          this.showFinalVerifyForm = false;
-          this.loadJob();
-        });
-    }
+    const currentJob = this.job();
+    if (!currentJob) return;
+
+    this.dialog.open(JobVerifyDialogComponent, {
+      width: '500px',
+      data: { job: currentJob },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadJob();
+    });
   }
 
   publish() {
-    if (confirm('Publish this job?')) {
-      this.jobService.publishJob(this.job()!.id).subscribe(() => this.loadJob());
-    }
+    const currentJob = this.job();
+    if (!currentJob) return;
+
+    this.dialogService.confirm(
+      'Publish Job',
+      'Are you sure you want to publish this job? It will be visible to vendors and candidates.',
+      'success'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.jobService.publishJob(currentJob.id).subscribe(() => this.loadJob());
+      }
+    });
   }
 
   deleteJob() {
-    if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
-      this.jobService.deleteJob(this.job()!.id).subscribe(() => {
-        this.router.navigate(['/jobs']);
-      });
-    }
+    this.dialogService.confirmDelete('Job').subscribe(confirmed => {
+      if (confirmed && this.job()) {
+        this.jobService.deleteJob(this.job()!.id).subscribe(() => {
+          this.router.navigate(['/jobs']);
+        });
+      }
+    });
   }
 
-  showUpdateStatusForm = false;
-  updateStatusForm = this.fb.group({
-    status: ['', Validators.required],
-    message: [''],
-  });
-
   onUpdateStatus() {
-    if (this.updateStatusForm.valid) {
-      this.jobService
-        .updateStatus(
-          this.job()!.id,
-          this.updateStatusForm.value.status!,
-          this.updateStatusForm.value.message || '',
-        )
-        .subscribe(() => {
-          this.showUpdateStatusForm = false;
-          this.loadJob();
-        });
-    }
+    const currentJob = this.job();
+    if (!currentJob) return;
+
+    this.dialog.open(JobStatusDialogComponent, {
+      width: '500px',
+      data: { job: currentJob },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadJob();
+    });
   }
 }

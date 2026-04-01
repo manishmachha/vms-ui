@@ -1,0 +1,79 @@
+<div class="p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="p-2.5 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl">
+      <mat-icon class="text-white text-xl">magic</mat-icon>
+    </div>
+    <div>
+      <h3 class="text-xl font-bold text-gray-900">Enrich Job Details</h3>
+      <p class="text-sm text-gray-500">Provide detailed requirements and skills information</p>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="ml-auto text-gray-400 hover:text-gray-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="enrichForm" (ngSubmit)="onEnrich()" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Skills (comma separated)</label>
+        <input
+          formControlName="skills"
+          placeholder="Java, Angular, Spring Boot"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none"
+        />
+      </div>
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Experience Required</label>
+        <input
+          formControlName="experience"
+          placeholder="3-5 Years"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1.5">Detailed Requirements</label>
+      <textarea
+        formControlName="requirements"
+        rows="4"
+        placeholder="List qualifications, certifications, prerequisites..."
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none resize-none"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1.5">Roles & Responsibilities</label>
+      <textarea
+        formControlName="rolesAndResponsibilities"
+        rows="4"
+        placeholder="Describe key duties and responsibilities..."
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none resize-none"
+      ></textarea>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        (click)="dialogRef.close()"
+        class="px-5 py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 font-medium transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="skipEnrichment()"
+        class="px-5 py-2.5 text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl hover:bg-indigo-100 font-medium transition-colors"
+      >
+        Skip Enrichment
+      </button>
+      <button
+        type="submit"
+        [disabled]="enrichForm.invalid"
+        class="px-8 py-2.5 bg-linear-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 font-bold transition-all shadow-lg shadow-purple-200 disabled:opacity-50"
+      >
+        Submit Enrichment
+      </button>
+    </div>
+  </form>
+</div>

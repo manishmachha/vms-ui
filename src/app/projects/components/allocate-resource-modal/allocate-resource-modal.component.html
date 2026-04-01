@@ -1,14 +1,22 @@
-<app-modal [isOpen]="isOpen" title="Allocate Resource" (isOpenChange)="onClose()">
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="text-xl font-bold text-gray-900 border-l-4 border-indigo-500 pl-3">Allocate Resource</h3>
+    <button mat-icon-button (click)="onClose()" class="text-gray-400 hover:text-gray-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
   <form [formGroup]="allocateForm" (ngSubmit)="allocateUser()" class="space-y-5">
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Select Candidate</label>
-      <div class="relative">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Select Candidate</label>
+      <div class="relative group">
+        <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">person_add</mat-icon>
         <select
           formControlName="candidateId"
-          class="block w-full pl-3 pr-10 py-2.5 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg border bg-white"
+          class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
         >
           <option value="">Choose a candidate...</option>
-          <option *ngFor="let candidate of candidates" [value]="candidate.id">
+          <option *ngFor="let candidate of data.candidates" [value]="candidate.id">
             {{ candidate.firstName }} {{ candidate.lastName }}
           </option>
         </select>
@@ -16,57 +24,63 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Billing Role</label>
-      <input
-        formControlName="billingRole"
-        placeholder="e.g. Senior Frontend Developer"
-        class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-      />
-    </div>
-
-    <div class="grid grid-cols-2 gap-5">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Billing Role</label>
+      <div class="relative group">
+        <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">badge</mat-icon>
         <input
-          type="date"
-          formControlName="startDate"
-          class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          formControlName="billingRole"
+          placeholder="e.g. Senior Frontend Developer"
+          class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
         />
       </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
-        <div class="flex items-center justify-between mb-1">
-          <label class="block text-sm font-medium text-gray-700">Allocation %</label>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Start Date</label>
+        <div class="relative group">
+          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">calendar_today</mat-icon>
+          <input
+            type="date"
+            formControlName="startDate"
+            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+          />
         </div>
-        <div class="relative rounded-md shadow-sm">
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2 px-1">
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Allocation %</label>
+        </div>
+        <div class="relative group">
           <input
             type="number"
             formControlName="percentage"
             min="0"
             max="100"
-            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 pr-10"
           />
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">%</span>
+            <span class="text-gray-400 font-bold">%</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="pt-4 flex justify-end gap-3">
+    <div class="pt-6 flex justify-end gap-3 border-t border-gray-50">
       <button
         type="button"
         (click)="onClose()"
-        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold transition-all"
       >
-        Cancel
+        Discard
       </button>
       <button
         type="submit"
         [disabled]="allocateForm.invalid"
-        class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center gap-2"
+        class="px-8 py-2.5 bg-linear-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
       >
-        <span>Confirm Allocation</span>
+        Confirm Allocation
       </button>
     </div>
   </form>
-</app-modal>
+</div>

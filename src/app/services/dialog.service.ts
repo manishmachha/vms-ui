@@ -1,42 +1,45 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DialogService {
-  isOpen = signal(false);
-  title = signal('');
-  message = signal('');
+  constructor(private dialog: MatDialog) {}
 
-  type = signal<'success' | 'warning' | 'error'>('success');
-
-  private onCloseCallback?: () => void;
-
-  open(
+  confirm(
     title: string,
     message: string,
-    type: 'success' | 'warning' | 'error' = 'success',
-    onClose?: () => void,
-  ) {
-    this.title.set(title);
-    this.message.set(message);
-    this.type.set(type);
-    this.isOpen.set(true);
-    this.onCloseCallback = onClose;
+    type: 'primary' | 'danger' | 'warning' | 'success' = 'primary',
+    confirmText: string = 'Confirm',
+    cancelText: string = 'Cancel'
+  ): Observable<boolean> {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { title, message, type, confirmText, cancelText },
+      panelClass: 'dialog-modern'
+    });
+
+    return dialogRef.afterClosed();
   }
 
-  close() {
-    this.isOpen.set(false);
-    if (this.onCloseCallback) {
-      this.onCloseCallback();
-      this.onCloseCallback = undefined;
-    }
+  alert(title: string, message: string, type: 'primary' | 'danger' | 'warning' | 'success' = 'primary'): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { title, message, type, confirmText: 'OK', cancelText: '' },
+      panelClass: 'dialog-modern'
+    });
   }
 
-  // Simple confirmation using window.confirm for now to match component usage
-  confirm(title: string, message: string): Observable<boolean> {
-    const result = window.confirm(`${title}\n\n${message}`);
-    return of(result);
+  // Helper for common delete confirmations
+  confirmDelete(entityName: string): Observable<boolean> {
+    return this.confirm(
+      'Confirm Delete',
+      `Are you sure you want to delete ${entityName}? This action cannot be undone.`,
+      'danger',
+      'Delete'
+    );
   }
 }

@@ -11,6 +11,8 @@ import { AllocateResourceModalComponent } from '../components/allocate-resource-
 import { UserAvatarComponent } from '../../layout/components/user-avatar/user-avatar.component';
 import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../candidates/models/candidate.model';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogService } from '../../services/dialog.service';
 @Component({
   selector: 'app-project-detail',
   standalone: true,
@@ -18,7 +20,6 @@ import { Candidate } from '../../candidates/models/candidate.model';
     CommonModule,
     RouterLink,
     OrganizationLogoComponent,
-    AllocateResourceModalComponent,
     UserAvatarComponent,
   ],
   templateUrl: './project-detail.component.html',
@@ -30,16 +31,13 @@ export class ProjectDetailComponent implements OnInit {
   private userService = inject(UserService);
   private candidateService = inject(CandidateService);
   private headerService = inject(HeaderService);
+  private dialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
 
   project = signal<Project | null>(null);
   allocations = signal<ProjectAllocation[]>([]);
   users = signal<User[]>([]);
   candidates = signal<Candidate[]>([]);
-
-  showAllocateModal = false;
-  showDeallocateConfirm = false;
-  allocationToRemove: ProjectAllocation | null = null;
-  deallocating = false;
 
   private colors = [
     '#6366f1',
@@ -156,26 +154,27 @@ export class ProjectDetailComponent implements OnInit {
     return Math.min(100, ((allocEnd - allocStart) / (projectEnd - projectStart)) * 100);
   }
 
-  confirmDeallocate(alloc: ProjectAllocation) {
-    this.allocationToRemove = alloc;
-    this.showDeallocateConfirm = true;
+  openAllocateModal() {
+    this.dialog.open(AllocateResourceModalComponent, {
+      width: '500px',
+      data: { projectId: this.project()?.id },
+      panelClass: 'dialog-modern'
+    }).afterClosed().subscribe(result => {
+      if (result) this.loadAllocations(this.project()!.id);
+    });
   }
 
-  deallocate() {
-    if (!this.allocationToRemove || !this.project()) return;
-    this.deallocating = true;
-
-    this.projectService.deallocateUser(this.project()!.id, this.allocationToRemove.id).subscribe({
-      next: () => {
-        this.loadAllocations(this.project()!.id);
-        this.showDeallocateConfirm = false;
-        this.allocationToRemove = null;
-        this.deallocating = false;
-      },
-      error: (err) => {
-        console.error('Failed to deallocate', err);
-        this.deallocating = false;
-      },
+  confirmDeallocate(alloc: ProjectAllocation) {
+    this.dialogService.confirm(
+      'Deallocate Resource',
+      `Are you sure you want to remove this resource from the project?`,
+      'danger'
+    ).subscribe(confirmed => {
+      if (confirmed && this.project()) {
+        this.projectService.deallocateUser(this.project()!.id, alloc.id).subscribe(() => {
+          this.loadAllocations(this.project()!.id);
+        });
+      }
     });
   }
 }

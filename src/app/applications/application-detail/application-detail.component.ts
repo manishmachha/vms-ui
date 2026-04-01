@@ -20,7 +20,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BaseChartDirective } from 'ng2-charts';
 import { forkJoin, of, Subscription, interval } from 'rxjs';
-import { startWith, switchMap, map, catchError } from 'rxjs/operators';
+import { startWith, switchMap, map, catchError, take } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 
 import { ApplicationService } from '../../services/application.service';
 import { DialogService } from '../../services/dialog.service';
@@ -36,6 +37,7 @@ import { UserService } from '../../services/user.service';
 import { Interview, InterviewType } from '../../models/interview.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
+import { ScheduleInterviewDialogComponent } from '../dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
 
 @Component({
   selector: 'app-application-detail',
@@ -69,6 +71,7 @@ export class ApplicationDetailComponent implements OnInit {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   // Permission Signal
   // Permission Signals
@@ -108,30 +111,6 @@ export class ApplicationDetailComponent implements OnInit {
   // Interview State
   interviews = signal<Interview[]>([]);
   showScheduleModal = signal(false);
-  potentialCcUsers = signal<any[]>([]);
-  userSearchTerm = signal('');
-
-  filteredCcUsers = computed(() => {
-    const term = this.userSearchTerm().toLowerCase();
-    const users = this.potentialCcUsers();
-    if (!term) return users;
-    return users.filter(
-      (u) =>
-        u.firstName?.toLowerCase().includes(term) ||
-        u.lastName?.toLowerCase().includes(term) ||
-        u.email?.toLowerCase().includes(term) ||
-        u.organizationName?.toLowerCase().includes(term),
-    );
-  });
-
-  scheduleForm = this.fb.group({
-    scheduledAt: ['', Validators.required],
-    durationMinutes: [30, [Validators.required, Validators.min(15)]],
-    type: ['TECHNICAL' as InterviewType, Validators.required],
-    meetingLink: [''],
-    ccUserIds: [[] as number[]],
-    schedulingNotes: [''],
-  });
 
   // Documents
   selectedFile: File | null = null;
@@ -381,35 +360,9 @@ export class ApplicationDetailComponent implements OnInit {
         if (app.candidate?.id) {
           this.loadBrandedResume(app.candidate.id);
         }
-
-        if (app.candidate?.organization?.id) {
-          this.loadPotentialCcUsers(Number(app.candidate.organization.id));
-        } else {
-          this.loadPotentialCcUsers();
-        }
       },
       error: (error) => console.error(error),
     });
-  }
-
-  loadPotentialCcUsers(vendorOrgId?: number) {
-    const internalUsers$ = this.userService.getUsers().pipe(
-      map((res) => (res as any).data || res),
-      catchError(() => of([])),
-    );
-
-    forkJoin([internalUsers$])
-      .pipe(
-        map(([internal]: [any[]]) => {
-          const combined = [...internal];
-          const unique = Array.from(new Map(combined.map((u) => [u.id, u])).values());
-          return unique;
-        }),
-      )
-      .subscribe((unique) => {
-        this.potentialCcUsers.set(unique);
-        this.cdr.markForCheck();
-      });
   }
 
   loadBrandedResume(candidateId: string | number) {
@@ -458,31 +411,18 @@ export class ApplicationDetailComponent implements OnInit {
   }
 
   scheduleInterview() {
-    if (this.scheduleForm.invalid) return;
     const appId = this.application()?.id;
     if (!appId) return;
 
-    const request = {
-      ...this.scheduleForm.value,
-      applicationId: Number(appId),
-      interviewerId: this.authStore.user()?.id || 1, // Default to current user for now if no selector
-    };
-
-    this.interviewService.scheduleInterview(request).subscribe({
-      next: () => {
-        this.showScheduleModal.set(false);
+    this.dialog.open(ScheduleInterviewDialogComponent, {
+      width: '600px',
+      data: { applicationId: appId },
+      panelClass: 'dialog-modern'
+    }).afterClosed().pipe(take(1)).subscribe(result => {
+      if (result) {
         this.loadInterviews(appId);
         this.loadTimeline(appId);
-        this.scheduleForm.reset({
-          durationMinutes: 30,
-          type: 'TECHNICAL',
-          ccUserIds: [],
-          schedulingNotes: '',
-        });
-      },
-      error: (err) => {
-        this.dialogService.open('Error', 'Failed to schedule interview.');
-      },
+      }
     });
   }
 
@@ -517,7 +457,7 @@ export class ApplicationDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to download resume', err);
-        this.dialogService.open('Error', 'Failed to download resume. The file may not exist.');
+        this.dialogService.alert('Error', 'Failed to download resume. The file may not exist.', 'danger');
       },
     });
   }
@@ -534,7 +474,7 @@ export class ApplicationDetailComponent implements OnInit {
         a.click();
         window.URL.revokeObjectURL(url);
       },
-      error: () => this.dialogService.open('Error', 'Failed to download branded resume.'),
+      error: () => this.dialogService.alert('Error', 'Failed to download branded resume.', 'danger'),
     });
   }
 
@@ -563,7 +503,7 @@ export class ApplicationDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to upload document', err);
-        this.dialogService.open('Error', 'Failed to upload document. Please try again.');
+        this.dialogService.alert('Error', 'Failed to upload document. Please try again.', 'danger');
       },
     });
   }
@@ -580,7 +520,7 @@ export class ApplicationDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to download document', err);
-        this.dialogService.open('Error', 'Failed to download document. The file may not exist.');
+        this.dialogService.alert('Error', 'Failed to download document. The file may not exist.', 'danger');
       },
     });
   }
