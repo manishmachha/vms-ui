@@ -39,11 +39,6 @@ export class ResumeDetailComponent implements OnInit {
     this.brandedResumeService.getById(id).subscribe({
       next: (r) => {
         this.resume.set(r);
-        this.headerService.setTitle(
-          `${r.candidate?.firstName} ${r.candidate?.lastName} — v${r.version}`,
-          'Branded resume preview',
-          'bi bi-file-earmark-pdf-fill',
-        );
 
         // Load PDF preview
         if (r.status === 'COMPLETED') {
