@@ -8,7 +8,8 @@ export interface TimelineEvent {
   entityType: string;
   entityId: number;
   action: string;
-  description: string;
+  title: string;
+  message: string;
   metadata?: string;
   actorId: number;
   createdAt: string;
