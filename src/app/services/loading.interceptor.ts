@@ -6,7 +6,7 @@ import {
   HttpEvent,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { delay, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { LoadingService } from './loading.service';
 import { SKIP_LOADER } from './api.service';
 
@@ -29,7 +29,6 @@ export class LoadingInterceptor implements HttpInterceptor {
     this.loadingService.show();
 
     return next.handle(req).pipe(
-      delay(500), // ⏳ Add 500ms delay (adjust as needed)
       finalize(() => {
         this.loadingService.hide();
       }),
