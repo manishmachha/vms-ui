@@ -90,6 +90,13 @@ export class SidebarComponent implements OnInit {
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'ORGANIZATION',
         },
+        {
+          label: 'DevOps',
+          route: '/devops',
+          icon: 'bi bi-terminal',
+          roles: ['SUPER_ADMIN', 'MANAGER'],
+          orgTypes: ['SOLVENTEK'],
+        },
       ],
     },
     {
