@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DevOpsDashboardComponent } from './devops-dashboard/devops-dashboard.component';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { TerminalComponent } from './terminal/terminal.component';
+import { LogViewerComponent } from './log-viewer/log-viewer.component';
 
 export const DEVOPS_ROUTES: Routes = [
   {
@@ -12,6 +13,7 @@ export const DEVOPS_ROUTES: Routes = [
       { path: 'terminal', component: TerminalComponent },
       { path: 'terminal/:containerId', component: TerminalComponent },
       { path: 'host-terminal', component: TerminalComponent },
+      { path: 'logs/:containerId', component: LogViewerComponent },
     ]
   }
 ];
