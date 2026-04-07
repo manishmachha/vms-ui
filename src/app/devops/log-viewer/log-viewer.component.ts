@@ -91,12 +91,15 @@ export class LogViewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.term.loadAddon(this.fitAddon);
     this.term.open(this.terminalContainer.nativeElement);
     
-    // Slight delay ensures the DOM is fully painted before fitting
+    // Delay connection until after the DOM finishes painting and terminal fits
     setTimeout(() => {
       this.fitAddon.fit();
-    }, 50);
-
-    this.connectWebSocket();
+      this.connectWebSocket();
+      
+      // Auto-resize on container dimension changes
+      const ro = new ResizeObserver(() => this.fitAddon.fit());
+      ro.observe(this.terminalContainer.nativeElement);
+    }, 100);
   }
 
   private connectWebSocket(): void {
@@ -116,8 +119,6 @@ export class LogViewerComponent implements OnInit, OnDestroy, AfterViewInit {
       } else if (typeof event.data === 'string') {
         this.term.write(event.data);
       }
-      // Auto-scroll ensures the latest logs are always visible
-      this.term.scrollToBottom();
     };
 
     this.socket.onclose = () => {

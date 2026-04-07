@@ -97,12 +97,14 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     this.term.loadAddon(this.fitAddon);
     this.term.open(this.terminalContainer.nativeElement);
     
-    // Slight delay ensures the DOM is fully painted before fitting
+    // Delay connection until after the DOM finishes painting and terminal fits
     setTimeout(() => {
       this.fitAddon.fit();
-    }, 50);
+      this.connectWebSocket();
 
-    this.connectWebSocket();
+      const ro = new ResizeObserver(() => this.fitAddon.fit());
+      ro.observe(this.terminalContainer.nativeElement);
+    }, 100);
   }
 
   private connectWebSocket(): void {
