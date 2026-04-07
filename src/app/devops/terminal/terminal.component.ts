@@ -11,16 +11,19 @@ import { DevOpsService } from '../../services/devops.service';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="h-full w-full bg-black p-4 rounded-xl border border-slate-700 shadow-2xl flex flex-col">
-      <div class="flex items-center gap-2 mb-4 text-slate-400 text-xs font-mono uppercase tracking-widest border-b border-slate-800 pb-2">
-        <i class="bi bi-terminal-fill text-indigo-500"></i>
-        <span>{{ terminalTitle() }}</span>
-        <span class="ml-auto flex items-center gap-2">
-          <div [class]="statusColor()" class="w-1.5 h-1.5 rounded-full"></div>
-          {{ statusText() }}
+    <div class="h-full w-full bg-[#09090b]/80 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col overflow-hidden relative">
+      <div class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
+      <div class="relative flex items-center gap-3 mb-4 text-slate-300 text-xs font-mono uppercase tracking-widest border-b border-white/5 pb-3">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+          <i class="bi bi-terminal-fill"></i>
+        </div>
+        <span class="font-semibold tracking-wider text-slate-200">{{ terminalTitle() }}</span>
+        <span class="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5 shadow-inner">
+          <div [class]="statusColor()" class="w-2 h-2 rounded-full shadow-[0_0_8px] shadow-current"></div>
+          <span class="opacity-90">{{ statusText() }}</span>
         </span>
       </div>
-      <div #terminalContainer class="flex-1 w-full min-h-[500px]"></div>
+      <div #terminalContainer class="relative flex-1 w-full min-h-[500px] rounded-lg overflow-hidden border border-white/5 bg-[#020202]"></div>
     </div>
   `,
   styles: [`
@@ -103,6 +106,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
       : this.devOpsService.getTerminalUrl(this.containerId);
 
     this.socket = new WebSocket(url);
+    this.socket.binaryType = 'arraybuffer'; // highly efficient zero-chop array buffer
 
     this.socket.onopen = () => {
       this.statusText.set('Connected');
@@ -111,13 +115,10 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     };
 
     this.socket.onmessage = (event) => {
-      // Handle both string and binary data
-      if (typeof event.data === 'string') {
+      if (event.data instanceof ArrayBuffer) {
+        this.term.write(new Uint8Array(event.data));
+      } else if (typeof event.data === 'string') {
         this.term.write(event.data);
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => this.term.write(new Uint8Array(reader.result as ArrayBuffer));
-        reader.readAsArrayBuffer(event.data);
       }
     };
 
@@ -132,7 +133,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
       this.statusColor.set('bg-rose-500');
     };
 
-    this.term.onData(data => {
+    this.term.onData((data: string) => {
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send(data);
       }
