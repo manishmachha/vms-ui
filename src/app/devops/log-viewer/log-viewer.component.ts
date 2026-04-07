@@ -84,12 +84,17 @@ export class LogViewerComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       fontFamily: '"JetBrains Mono", "Fira Code", monospace',
       fontSize: 13,
-      allowProposedApi: true
+      allowProposedApi: true,
+      convertEol: true
     });
 
     this.term.loadAddon(this.fitAddon);
     this.term.open(this.terminalContainer.nativeElement);
-    this.fitAddon.fit();
+    
+    // Slight delay ensures the DOM is fully painted before fitting
+    setTimeout(() => {
+      this.fitAddon.fit();
+    }, 50);
 
     this.connectWebSocket();
   }
