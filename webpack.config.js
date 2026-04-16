@@ -3,6 +3,7 @@ const { shareAll, withModuleFederationPlugin } = require('@angular-architects/mo
 module.exports = withModuleFederationPlugin({
 
   name: 'vms',
+  publicPath: 'auto',
 
   exposes: {
     './routes': './src/app/app.routes.ts',
