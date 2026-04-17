@@ -23,6 +23,7 @@ import { HeaderService } from '../../../services/header.service';
 import { TimelineService, TimelineEvent } from '../../../services/timeline.service';
 import { TimelineComponent } from '../../../layout/components/timeline/timeline.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-candidate-detail',
@@ -46,6 +47,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 export class CandidateDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   private candidateService = inject(CandidateService);
   private snackBar = inject(MatSnackBar);
   private brandedResumeService = inject(BrandedResumeService);
@@ -191,7 +193,7 @@ export class CandidateDetailComponent implements OnInit {
         this.candidateService.deleteCandidate(c.id).subscribe({
           next: () => {
             this.snackBar.open('Candidate deleted', 'OK', { duration: 3000 });
-            this.router.navigate(['/candidates']);
+            this.mfeNav.navigate('/candidates');
           },
           error: () => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
         });

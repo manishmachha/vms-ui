@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { JobService } from '../../services/job.service';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-job-create',
@@ -15,6 +16,7 @@ export class JobCreateComponent implements OnInit {
   fb = inject(FormBuilder);
   jobService = inject(JobService);
   router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   route = inject(ActivatedRoute);
 
   isEditing = signal(false);
@@ -68,7 +70,7 @@ export class JobCreateComponent implements OnInit {
       if (this.isEditing() && this.jobId()) {
         this.jobService.updateJob(this.jobId()!, formValue as any).subscribe({
           next: () => {
-            this.router.navigate(['/jobs', this.jobId()]);
+            this.mfeNav.navigate('/jobs/' + this.jobId());
           },
         });
       } else {
@@ -76,7 +78,7 @@ export class JobCreateComponent implements OnInit {
         formValue.status = 'SUBMITTED';
         this.jobService.createJob(formValue as any).subscribe({
           next: () => {
-            this.router.navigate(['/jobs']);
+            this.mfeNav.navigate('/jobs');
           },
         });
       }
@@ -90,13 +92,13 @@ export class JobCreateComponent implements OnInit {
     if (this.isEditing() && this.jobId()) {
       this.jobService.updateJob(this.jobId()!, formValue as any).subscribe({
         next: () => {
-          this.router.navigate(['/jobs', this.jobId()]);
+          this.mfeNav.navigate('/jobs/' + this.jobId());
         },
       });
     } else {
       this.jobService.createJob(formValue as any).subscribe({
         next: () => {
-          this.router.navigate(['/jobs']);
+          this.mfeNav.navigate('/jobs');
         },
       });
     }

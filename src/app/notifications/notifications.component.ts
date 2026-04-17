@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService, Notification } from '../services/notification.service';
 import { HeaderService } from '../services/header.service';
+import { MfeNavigationService } from '../services/mfe-navigation.service';
 
 interface GroupedNotifications {
   label: string;
@@ -20,6 +21,7 @@ export class NotificationsComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private headerService = inject(HeaderService);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
 
   notifications = signal<Notification[]>([]);
   unreadCount = signal(0);
@@ -130,7 +132,7 @@ export class NotificationsComponent implements OnInit {
     }
     // Navigate if actionUrl is set
     if (notification.actionUrl) {
-      this.router.navigateByUrl(notification.actionUrl);
+      this.mfeNav.navigateByUrl(notification.actionUrl);
     }
   }
 

@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-vendor-create',
@@ -32,6 +33,7 @@ export class VendorCreateComponent {
   private organizationService = inject(OrganizationService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
 
   vendorForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
@@ -49,7 +51,7 @@ export class VendorCreateComponent {
     this.organizationService.createOrganization(vendorData).subscribe({
       next: (vendor) => {
         this.snackBar.open('Vendor created successfully', 'Close', { duration: 3000 });
-        this.router.navigate(['/vendors']);
+        this.mfeNav.navigate('/vendors');
       },
       error: (err) => {
         this.snackBar.open('Error creating vendor', 'Close', { duration: 3000 });

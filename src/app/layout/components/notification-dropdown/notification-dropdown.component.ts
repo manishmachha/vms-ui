@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { interval, switchMap } from 'rxjs';
 import { Notification, NotificationService } from '../../../services/notification.service';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-notification-dropdown',
@@ -24,6 +25,7 @@ export class NotificationDropdownComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private elementRef = inject(ElementRef);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   private destroyRef = inject(DestroyRef);
 
   notifications = signal<Notification[]>([]);
@@ -81,7 +83,7 @@ export class NotificationDropdownComponent implements OnInit {
     // Navigate if actionUrl is set
     if (notification.actionUrl) {
       this.isOpen.set(false);
-      this.router.navigateByUrl(notification.actionUrl);
+      this.mfeNav.navigateByUrl(notification.actionUrl);
     }
   }
 
@@ -96,7 +98,7 @@ export class NotificationDropdownComponent implements OnInit {
 
   viewAll() {
     this.isOpen.set(false);
-    this.router.navigate(['/notifications']);
+    this.mfeNav.navigate('/notifications');
   }
 
   getIcon(notification: Notification): string {

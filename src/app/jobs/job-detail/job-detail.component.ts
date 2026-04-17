@@ -20,6 +20,7 @@ import { JobStatusDialogComponent } from '../dialogs/job-status-dialog/job-statu
 import { TimelineService, TimelineEvent } from '../../services/timeline.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-job-detail',
@@ -40,6 +41,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class JobDetailComponent implements OnInit {
   route = inject(ActivatedRoute);
   router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   jobService = inject(JobService);
   authStore = inject(AuthStore);
   fb = inject(FormBuilder);
@@ -250,7 +252,7 @@ export class JobDetailComponent implements OnInit {
     this.dialogService.confirmDelete('Job').subscribe(confirmed => {
       if (confirmed && this.job()) {
         this.jobService.deleteJob(this.job()!.id).subscribe(() => {
-          this.router.navigate(['/jobs']);
+          this.mfeNav.navigate('/jobs');
         });
       }
     });

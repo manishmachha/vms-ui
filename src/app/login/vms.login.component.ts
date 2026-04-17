@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { MfeNavigationService } from '../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-vms-login',
@@ -15,6 +16,7 @@ export class VMSLoginComponent {
   private fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
 
   error = signal<string | null>(null);
   hidePassword = signal(true);
@@ -40,7 +42,7 @@ export class VMSLoginComponent {
           const userRole = authData?.role;
           console.log('userRole', userRole);
 
-          this.router.navigate(['/dashboard']);
+          this.mfeNav.navigate('/dashboard');
         },
         error: (err: any) => {
           this.error.set('Invalid credentials. Please check your email and password.');

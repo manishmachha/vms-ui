@@ -7,6 +7,7 @@ import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AuthStore } from '../../../services/auth.store';
 import { HeaderService } from '../../../services/header.service';
 import { AuthService } from '../../../services/auth.service';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-header',
@@ -28,12 +29,13 @@ export class HeaderComponent {
   authStore = inject(AuthStore);
   authService = inject(AuthService);
   router = inject(Router);
+  mfeNav = inject(MfeNavigationService);
 
   user = this.authStore.user;
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.mfeNav.navigate('/');
   }
 
   formatRole(role: any): string {

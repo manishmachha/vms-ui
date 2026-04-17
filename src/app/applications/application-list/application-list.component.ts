@@ -20,6 +20,7 @@ import { JobApplication } from '../../models/application.model';
 import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-application-list',
@@ -46,6 +47,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   private headerService = inject(HeaderService);
   private appService = inject(ApplicationService);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   dataSource = new MatTableDataSource<JobApplication>([]);
@@ -217,7 +219,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   viewDetails(app: JobApplication) {
-    this.router.navigate(['/applications', app.id]);
+    this.mfeNav.navigate('/applications/' + app.id);
   }
 
   getStatusClasses(status: string): string {

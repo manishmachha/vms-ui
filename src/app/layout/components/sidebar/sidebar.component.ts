@@ -13,6 +13,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { OrganizationLogoComponent } from '../organization-logo/organization-logo.component';
 import { NotificationCounts, NotificationService } from '../../../services/notification.service';
 import { AuthStore } from '../../../services/auth.store';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 export type UserRole =
   | 'SUPER_ADMIN'
@@ -50,6 +51,7 @@ export class SidebarComponent implements OnInit {
   authStore = inject(AuthStore);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private mfeNav = inject(MfeNavigationService);
 
   notificationCounts = signal<NotificationCounts | null>(null);
 
@@ -228,6 +230,11 @@ export class SidebarComponent implements OnInit {
 
   isExactRoute(route: string): boolean {
     return ['/dashboard', '/admin'].includes(route);
+  }
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
   }
 
   getOrgName(): string {

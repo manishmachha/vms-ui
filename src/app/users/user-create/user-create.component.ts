@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { Organization, Vendor } from '../../models/organization.model';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-user-create',
@@ -37,6 +38,7 @@ export class UserCreateComponent implements OnInit {
   private orgService = inject(OrganizationService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   private route = inject(ActivatedRoute);
 
   isEditMode = signal(false);
@@ -131,7 +133,7 @@ export class UserCreateComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.snackBar.open(`User ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'Close', { duration: 3000 });
-        this.router.navigate(['/organization/users']);
+        this.mfeNav.navigate('/organization/users');
       },
       error: (err) => {
         console.error(`Error ${this.isEditMode() ? 'updating' : 'creating'} user:`, err);

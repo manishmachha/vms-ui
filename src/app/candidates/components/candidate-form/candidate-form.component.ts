@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../models/candidate.model';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-candidate-form',
@@ -16,6 +17,7 @@ export class CandidateFormComponent {
   private fb = inject(FormBuilder);
   private candidateService = inject(CandidateService);
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
   private route = inject(ActivatedRoute);
 
   form = this.fb.group({
@@ -81,7 +83,7 @@ export class CandidateFormComponent {
       next: (candidate: Candidate) => {
         // Since backend saves validation is bypassed or auto-filled.
         // We can redirect to edit mode for this new candidate to allow user verification.
-        this.router.navigate(['/candidates']);
+        this.mfeNav.navigate('/candidates');
       },
       error: (err) => {
         console.error('Upload failed', err);
@@ -109,13 +111,13 @@ export class CandidateFormComponent {
     if (this.isEditMode() && this.candidateId()) {
       this.candidateService.updateCandidate(this.candidateId()!, payload).subscribe({
         next: () => {
-          this.router.navigate(['/candidates']);
+          this.mfeNav.navigate('/candidates');
         },
       });
     } else {
       this.candidateService.createManual(payload).subscribe({
         next: (candidate) => {
-          this.router.navigate(['/candidates']);
+          this.mfeNav.navigate('/candidates');
         },
         error: (err) => {
           console.error('Manual creation failed', err);

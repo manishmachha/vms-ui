@@ -2,6 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { StatItem } from '../../../models/dashboard-stats.model';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-hub-dashboard-banner',
@@ -14,17 +15,18 @@ export class HubDashboardBannerComponent {
   @Input() stats: StatItem[] = [];
   
   private router = inject(Router);
+  private mfeNav = inject(MfeNavigationService);
 
   navigateTo(route: string) {
     if (route) {
-      this.router.navigate([route]);
+      this.mfeNav.navigate(route);
     }
   }
 
   navigateToItem(id: number, baseRoute: string, event: Event) {
-    event.stopPropagation(); // Prevent parent card click
+    event.stopPropagation();
     if (baseRoute && id) {
-      this.router.navigate([baseRoute, id]);
+      this.mfeNav.navigate(baseRoute + '/' + id);
     }
   }
 

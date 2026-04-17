@@ -56,7 +56,7 @@
         >
           <ng-container *ngFor="let item of section.items">
             <a
-              [routerLink]="item.route"
+              [routerLink]="resolvePath(item.route)"
               routerLinkActive="active-link"
               [routerLinkActiveOptions]="{ exact: isExactRoute(item.route) }"
               (click)="onMenuClick()"
@@ -104,7 +104,7 @@
   <!-- Profile Section -->
   <div class="space-y-1">
     <a
-      routerLink="/profile"
+      [routerLink]="resolvePath('/profile')"
       routerLinkActive="active-link"
       (click)="onMenuClick()"
       class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-linear-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200"
