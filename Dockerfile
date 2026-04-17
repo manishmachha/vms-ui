@@ -22,34 +22,22 @@ FROM nginx:alpine
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
+# Copy the repo nginx.conf for proper MFE CORS headers
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Copy built Angular app to nginx html directory
-COPY --from=build /app/dist/vms_ui /usr/share/nginx/html
+# Angular 21 with ngx-build-plus may output to dist/<project>/browser/ or dist/<project>/
+COPY --from=build /app/dist/vms_ui /tmp/angular-build
+
+RUN if [ -d "/tmp/angular-build/browser" ]; then \
+      cp -r /tmp/angular-build/browser/* /usr/share/nginx/html/; \
+    else \
+      cp -r /tmp/angular-build/* /usr/share/nginx/html/; \
+    fi && \
+    rm -rf /tmp/angular-build
 
 # Ensure proper permissions for the nginx user
 RUN chmod -R 755 /usr/share/nginx/html
-
-# A robust config for Angular MFE
-RUN echo "server { \
-    listen 80; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    \
-    # Explicitly include mime types \
-    include /etc/nginx/mime.types; \
-    types { \
-        application/javascript js; \
-        text/css css; \
-    } \
-    \
-    location / { \
-        try_files \$uri \$uri/ /index.html; \
-    } \
-    \
-    location /health { \
-        access_log off; \
-        return 200 'healthy\n'; \
-    } \
-}" > /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 80
