@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,8 @@ import { MfeNavigationService } from '../services/mfe-navigation.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './vms.login.component.html',
-  styleUrl: './vms.login.component.css',
+  styleUrls: ['./vms.login.component.css', '../../styles.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class VMSLoginComponent {
   private fb = inject(FormBuilder);
